@@ -1,14 +1,3 @@
-# Hyperledger Meetup 2023 on Hyperledger Fabric
-
-## Sponsor
-
-|                                                                         |                                                                                                                                                                                                                               |
-| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![kfs logo](https://avatars.githubusercontent.com/u/74511895?s=200&v=4) | If you want to design and deploy a secure Blockchain network based on the latest version of Hyperledger Fabric, feel free to contact dviejo@kungfusoftware.es or visit [https://kfs.es/blockchain](https://kfs.es/blockchain) |
-
-
-## Getting started
-
 # Tutorial
 
 Resources:
