@@ -29,9 +29,9 @@ Next, run the network setup script:
 ```
 This script will set up a HyperLedger Fabric network with:
 - Two peer organizations with a CA each
-- One peer per organization
+  - One peer per organization
 - One orderer organization with a CA
-- One orderer in the orderer organization
+  - One orderer in the orderer organization
 - A main channel
 
 Finally, you can check if the pods are running with:
