@@ -32,10 +32,10 @@ import { Asset } from "./asset";
 // }
 
 @Info({
-  title: "AssetTransfer",
-  description: "Smart contract for trading assets",
+  title: "Health Chaincode",
+  description: "Smart contract for exchange of health/hospital assets",
 })
-export class AssetTransferContract extends Contract {
+export class HealthAssetTransferContract extends Contract {
   @Transaction()
   public async InitLedger(ctx: Context): Promise<void> {
     const assets: Asset[] = [
