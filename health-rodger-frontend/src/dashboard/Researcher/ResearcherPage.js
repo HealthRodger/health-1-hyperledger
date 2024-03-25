@@ -14,23 +14,30 @@ export default function ResearcherPage() {
     setSqlQuery(event.target.value);
   };
 
+  // For now, executes fcn GetAllAssets when pressing button
   const sendQueryToServer = async () => {
-    const singleLineQuery = sqlQuery.replace(/\n/g, ' ').trim(); // Replace new lines with spaces
-    if (!singleLineQuery) {
-      setUploadStatus("Please enter a valid SQL query.");
-      return;
-    }
-    setUploadStatus('Sending SQL query...');
+    const functionName = "GetAllAssets"; 
+    const functionArgs = []; 
+  
+    setUploadStatus('Querying all assets...');
+  
     try {
-      console.log(singleLineQuery)
-      const response = await axios.post('http://localhost:3003/evaluate', { sqlQuery: singleLineQuery });
-      setUploadStatus('SQL query successfully submitted.');
-      setEntries(response.data); // Assuming the response data is the set of entries to display
+      const response = await axios.post('http://localhost:3003/evaluate', {
+        fcn: functionName,
+        args: functionArgs,
+      });
+  
+      const assets = response.data;
+      console.log(assets); 
+  
+      setUploadStatus('Assets successfully retrieved.');
+      setEntries(assets); 
     } catch (error) {
-      console.error(error);
-      setUploadStatus("Error sending the SQL query.");
+      console.error('Error querying assets:', error);
+      setUploadStatus("Error retrieving assets.");
     }
   };
+  
 
     // Determine the icon and color based on uploadStatus
     const getStatusIcon = () => {

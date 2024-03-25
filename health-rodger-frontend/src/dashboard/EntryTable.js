@@ -42,18 +42,18 @@ export default function EntryTable({ entries }) {
             </TableRow>
           </TableHead>
           <TableBody>
-          {entries.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell>{row.mID}</TableCell>
-                <TableCell>{row.name}</TableCell>
-                <TableCell>{row.type}</TableCell>
-                <TableCell>{row.ipAdr}</TableCell>
-                <TableCell>{row.available}</TableCell>
-                <TableCell>{row.lastUpdate}</TableCell>
-                <TableCell>{row.isWearable}</TableCell>
-                <TableCell>{row.ownerHospital}</TableCell>
-                <TableCell>{row.ownerDepartment}</TableCell>
-                <TableCell>{row.ownerContactPerson}</TableCell>
+            {entries.map((entry) => (
+              <TableRow key={entry.ID}>
+                <TableCell>{entry.ID}</TableCell>
+                <TableCell>{entry.Name}</TableCell>
+                <TableCell>{entry.Type}</TableCell>
+                <TableCell>{entry.IpAddress}</TableCell>
+                <TableCell>{entry.Available ? 'Yes' : 'No'}</TableCell>
+                <TableCell>{new Date(entry.LastUpdate * 1000).toLocaleString()}</TableCell>
+                <TableCell>{entry.IsWearable ? 'Yes' : 'No'}</TableCell>
+                <TableCell>{entry.Owner.Hospital}</TableCell>
+                <TableCell>{entry.Owner.Department}</TableCell>
+                <TableCell>{entry.Owner.ContactPerson}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -62,3 +62,4 @@ export default function EntryTable({ entries }) {
     </React.Fragment>
   );
 }
+
