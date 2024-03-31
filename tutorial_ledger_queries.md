@@ -292,6 +292,9 @@ kubectl wait --timeout=180s --for=condition=Running fabricpeers.hlf.kungfusoftwa
 kubectl wait --timeout=180s --for=condition=Running fabricorderernodes.hlf.kungfusoftware.es --all
 ```
 
+# MAKE SURE TO WAIT FOR THE NODES TO BE RUNNING BEFORE CONTINUING!!!
+Just wait for a bit if the above command says something like: timed out waiting for the condition. It should eventually say that all nodes are running.
+
 Check that the peers and orderer are deployed and work (this step usually doesnt work for me, but idk. If this returns something like cert not found, it's fine):
 
 ```bash
