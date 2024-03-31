@@ -724,6 +724,24 @@ kubectl hlf chaincode invoke --config=resources/network.yaml \
     --fcn=InitLedger
 ```
 
+```bash
+kubectl hlf chaincode invoke --config=resources/network.yaml \
+    --user=admin --peer=org1-peer0.default \
+    --chaincode=asset --channel=demo \
+    --fcn=CreateAsset \
+    -a="assetid1" \
+    -a="assetname1" \
+    -a="Wearable" \
+    -a="0.0.0.0" \
+    -a="true" \
+    -a="0" \
+    -a="true" \
+    -a="-" \
+    -a="Meander" \
+    -a="Radiology" \
+    -a="Jaylan"
+```
+
 ## Query assets in the channel
 
 ```bash
@@ -731,6 +749,13 @@ kubectl hlf chaincode query --config=resources/network.yaml \
     --user=admin --peer=org1-peer0.default \
     --chaincode=asset --channel=demo \
     --fcn=GetAllAssets
+```
+
+```bash
+kubectl hlf chaincode query --config=resources/network.yaml \
+    --user=admin --peer=org1-peer0.default \
+    --chaincode=asset --channel=demo \
+    --fcn=QueryAssets -a="{\"selector\":{\"ID\": \"assetid1\"}, \"fields\": [\"IpAddress\"]}"
 ```
 
 
