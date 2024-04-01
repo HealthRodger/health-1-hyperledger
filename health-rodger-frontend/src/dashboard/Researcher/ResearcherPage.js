@@ -1,112 +1,99 @@
-import React, { useState } from 'react';
-import { Container, Grid, Paper, Typography, TextField, Button } from '@mui/material';
-import { CheckCircle, ErrorOutline } from '@mui/icons-material';
-import axios from 'axios';
-import { green, grey, red } from '@mui/material/colors';
-import EntryTable from '../EntryTable';
+import React from "react";
+import GenericQuery from "./GenericQuery";
+import GenericSingleParameterQuery from "./GenericSingleParameterQuery";
+import GenericNoParameterQuery from "./GenericNoParameterQuery";
 
 export default function ResearcherPage() {
-  const [sqlQuery, setSqlQuery] = useState('');
-  const [uploadStatus, setUploadStatus] = useState('Enter your SQL query.');
-  const [entries, setEntries] = useState([]);
-
-  const handleQueryChange = (event) => {
-    setSqlQuery(event.target.value);
-  };
-
-  // For now, executes fcn GetAllAssets when pressing button
-  const sendQueryToServer = async () => {
-    const functionName = "GetAllAssets"; 
-    const functionArgs = []; 
-  
-    setUploadStatus('Querying all assets...');
-  
-    try {
-      const response = await axios.post('http://localhost:3003/evaluate', {
-        fcn: functionName,
-        args: functionArgs,
-      });
-  
-      const assets = response.data;
-      console.log(assets); 
-  
-      setUploadStatus('Assets successfully retrieved.');
-      setEntries(assets); 
-    } catch (error) {
-      console.error('Error querying assets:', error);
-      setUploadStatus("Error retrieving assets.");
-    }
-  };
-  
-
-    // Determine the icon and color based on uploadStatus
-    const getStatusIcon = () => {
-      if (uploadStatus.toLowerCase().includes('error')) {
-        return <ErrorOutline sx={{ fontSize: 40, color: red[500] }} />;
-      } else if (uploadStatus.toLowerCase().includes('completed')) {
-        return <CheckCircle sx={{ fontSize: 40, color: green[500] }} />;
-      } else {
-        return null; // No icon
-      }
-    };
-  
-    // Determine the background color based on uploadStatus
-    const getBackgroundColor = () => {
-      if (uploadStatus.toLowerCase().includes('error')) {
-        return red[100];
-      } else if (uploadStatus.toLowerCase().includes('completed')) {
-        return green[100];
-      } else if (uploadStatus.toLowerCase().includes('waiting')) {
-        return grey[100];
-      } else {
-        return 'inherit';
-      }
-    };
-
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8} lg={9}>
-          <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: 240 }}>
-            <TextField
-              fullWidth
-              label="SQL Query"
-              variant="outlined"
-              multiline // Enables multiline input
-              minRows={4} // Minimum number of rows the textarea will occupy
-              value={sqlQuery}
-              onChange={handleQueryChange}
-              sx={{ mb: 2 }}
-            />
-            <Button variant="contained" color="primary" onClick={sendQueryToServer}>
-              Send SQL Query
-            </Button>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={4} lg={3}>
-          <Paper
-            sx={{
-              p: 2,
-              display: 'flex',
-              flexDirection: 'column',
-              height: 240,
-              backgroundColor: getBackgroundColor(),
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            {getStatusIcon()}
-            <Typography component="p" variant="h4" sx={{ color: uploadStatus.toLowerCase().includes('error') ? (red[500]) : (uploadStatus.toLowerCase().includes('enter') ? grey[500] : green[500]) }}>
-              {uploadStatus}
-            </Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={12}>
-          <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-            <EntryTable entries={entries} />
-          </Paper>
-        </Grid>
-      </Grid>
-    </Container>
+    <>
+      <GenericQuery />
+      <GenericSingleParameterQuery
+        title="List all devices not updated since given timestamp"
+        headers={["ID", "Name", "LastUpdate"]}
+        parameterName={"Unix Timestamp"}
+        parameterType={"number"}
+        argsToQueryString={(timestamp) => {
+          return `{"selector": {"LastUpdate": {"$lt": ${timestamp}}}, "fields": ["ID", "Name", "LastUpdate"]}`;
+        }}
+      />
+      <GenericSingleParameterQuery
+        title="List all devices updated since given timestamp"
+        headers={["ID", "Name", "LastUpdate"]}
+        parameterName={"Unix Timestamp"}
+        parameterType={"number"}
+        argsToQueryString={(timestamp) => {
+          return `{"selector": {"LastUpdate": {"$gt": ${timestamp}}}, "fields": ["ID", "Name", "LastUpdate"]}`;
+        }}
+      />
+      <GenericSingleParameterQuery
+        title="List all available devices not updated since given timestamp"
+        headers={["ID", "Name", "LastUpdate"]}
+        parameterName={"Unix Timestamp"}
+        parameterType={"number"}
+        argsToQueryString={(timestamp) => {
+          return `{"selector": {"LastUpdate": {"$lt": ${timestamp}}, "Available": true}, "fields": ["ID", "Name", "LastUpdate"]}`;
+        }}
+      />
+      <GenericSingleParameterQuery
+        title="List all non-available devices not updated since given timestamp"
+        headers={["ID", "Name", "LastUpdate"]}
+        parameterName={"Unix Timestamp"}
+        parameterType={"number"}
+        argsToQueryString={(timestamp) => {
+          return `{"selector": {"LastUpdate": {"$lt": ${timestamp}}, "Available": false}, "fields": ["ID", "Name", "LastUpdate"]}`;
+        }}
+      />
+      <GenericSingleParameterQuery
+        title={
+          "5a. List all devices from a given department (over all hospitals)"
+        }
+        headers={["ID", "Name", "Available", "LastUpdate", "Owner"]}
+        parameterName="Department name"
+        argsToQueryString={(department) => {
+          return `{"selector": {"Owner.Department": "${department}"}, "fields": ["ID", "Name", "Available", "LastUpdate", "Owner.Hospital", "Owner.ContactPerson"]}`;
+        }}
+      />
+      <GenericSingleParameterQuery
+        title={
+          "5b. List all available devices from a given department (over all hospitals)"
+        }
+        headers={["ID", "Name", "LastUpdate", "Owner"]}
+        parameterName="Department name"
+        argsToQueryString={(department) => {
+          return `{"selector": {"Owner.Department": "${department}", "Available": true}, "fields": ["ID", "Name", "LastUpdate", "Owner.Hospital", "Owner.ContactPerson"]}`;
+        }}
+      />
+      <GenericSingleParameterQuery
+        title={
+          "5c. List all non-available devices from a given department (over all hospitals)"
+        }
+        headers={["ID", "Name", "LastUpdate", "Owner"]}
+        parameterName="Department name"
+        argsToQueryString={(department) => {
+          return `{"selector": {"Owner.Department": "${department}", "Available": false}, "fields": ["ID", "Name", "LastUpdate", "Owner.Hospital", "Owner.ContactPerson"]}`;
+        }}
+      />
+      <GenericSingleParameterQuery
+        title={"6. List all devices of a given type"}
+        headers={["ID", "Name", "Available", "LastUpdate"]}
+        parameterName="Type"
+        argsToQueryString={(type) => {
+          return `{"selector": {"Type": "${type}"}, "fields": ["ID", "Name", "Available", "LastUpdate"]}`;
+        }}
+      />
+      <GenericSingleParameterQuery
+        title={"10. List all devices owned by given hospital"}
+        headers={["ID", "Name", "Owner"]}
+        parameterName="Hospital name"
+        argsToQueryString={(hospital) => {
+          return `{"selector": {"Owner.Hospital": "${hospital}"}, "fields": ["ID", "Name", "Owner.Department", "Owner.ContactPerson"]}`;
+        }}
+      />
+      <GenericNoParameterQuery
+        title={"11. List the devices that have been unavailable the longest"}
+        headers={["ID", "Name", "LastUpdate"]}
+        queryString={`{"selector": {"Available": false}, "fields": ["ID", "Name", "LastUpdate"], "sort": [{"LastUpdate": "asc"}]`}
+      />
+    </>
   );
 }
