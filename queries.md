@@ -45,7 +45,7 @@ const timestamp;
 ```
 
 ```bash
-kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a='{\"selector\": {\"LastUpdate\": {\"$gt\": $TIMESTAMP}},\"fields\": [\"ID\",\"Name\",\"LastUpdate\"]}'
+kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a="{\"selector\": {\"LastUpdate\": {\"$gt\": $TIMESTAMP}},\"fields\": [\"ID\",\"Name\",\"LastUpdate\"]}"
 
 peer chaincode query -C mychannel -n ledger -c '{"function":"QueryAssets","Args":["{\"selector\": {\"LastUpdate\": {\"$gt\": $TIMESTAMP}},\"fields\": [\"ID\",\"Name\",\"LastUpdate\"]}"]}'
 ```
@@ -70,7 +70,7 @@ const timestamp;
 }
 ```
 ```bash
-kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a='{\"selector\": {\"LastUpdate\": {\"\$lt\": timestamp},\"Available\": true},\"fields\": [\"ID\",\"Name\",\"LastUpdate\"]}'
+kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a="{\"selector\": {\"LastUpdate\": {\"\$lt\": timestamp},\"Available\": true},\"fields\": [\"ID\",\"Name\",\"LastUpdate\"]}"
 
 peer chaincode query -C mychannel -n ledger -c '{"function":"QueryAssets","Args":["{\"selector\": {\"LastUpdate\": {\"$lt\": timestamp},\"Available\": true},\"fields\": [\"ID\",\"Name\",\"LastUpdate\"]}"]}'
 ```
@@ -96,7 +96,7 @@ const timestamp;
 ```
 
 ```bash
-kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a='{\"selector\": {\"LastUpdate\": {\"\$lt\": timestamp},\"Available\": false},\"fields\": [\"ID\",\"Name\",\"LastUpdate\"]}'
+kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a="{\"selector\": {\"LastUpdate\": {\"\$lt\": timestamp},\"Available\": false},\"fields\": [\"ID\",\"Name\",\"LastUpdate\"]}"
 
 peer chaincode query -C mychannel -n ledger -c '{"function":"QueryAssets","Args":["{\"selector\": {\"LastUpdate\": {\"$lt\": timestamp},\"Available\": false},\"fields\": [\"ID\",\"Name\",\"LastUpdate\"]}"]}'
 ```
@@ -122,7 +122,7 @@ const department;
 ```
 
 ```bash
-kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a='{\"selector\": {\"Owner.Department\": department,\"Available\": true},\"fields\": [\"ID\",\"Name\",\"Owner.Department\"]}'
+kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a="{\"selector\": {\"Owner.Department\": department,\"Available\": true},\"fields\": [\"ID\",\"Name\",\"Owner.Department\"]}"
 
 peer chaincode query -C mychannel -n ledger -c '{"function":"QueryAssets","Args":["{\"selector\": {\"Owner.Department\": department,\"Available\": true},\"fields\": [\"ID\",\"Name\",\"Owner.Department\"]}"]}'
 ```
@@ -147,7 +147,7 @@ const department;
 ```
 
 ```bash
-kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a='{\"selector\": {\"Owner.Department\": department,\"Available\": false},\"fields\": [\"ID\",\"Name\",\"Owner.Department\"]}'
+kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a="{\"selector\": {\"Owner.Department\": department,\"Available\": false},\"fields\": [\"ID\",\"Name\",\"Owner.Department\"]}"
 
 peer chaincode query -C mychannel -n ledger -c '{"function":"QueryAssets","Args":["{\"selector\": {\"Owner.Department\": department,\"Available\": false},\"fields\": [\"ID\",\"Name\",\"Owner.Department\"]}"]}'
 ```
@@ -172,7 +172,7 @@ const type;
 ```
 
 ```bash
-kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a='{\"selector\": {\"Type\": type,},\"fields\": [\"ID\",\"Name\",\"Type\"]}'
+kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a="{\"selector\": {\"Type\": type,},\"fields\": [\"ID\",\"Name\",\"Type\"]}"
 
 peer chaincode query -C mychannel -n ledger -c '{"function":"QueryAssets","Args":["{\"selector\": {\"Type\": type,},\"fields\": [\"ID\",\"Name\",\"Type\"]}"]}'
 ```
@@ -196,7 +196,7 @@ const hospital;
 ```
 
 ```bash
-kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a='{\"selector\": {\"Type\": type,\"Owner.Hospital\": hospital},\"fields\": [\"ID\",\"Available\"]}'
+kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a="{\"selector\": {\"Type\": type,\"Owner.Hospital\": hospital},\"fields\": [\"ID\",\"Available\"]}"
 
 peer chaincode query -C mychannel -n ledger -c '{"function":"QueryAssets","Args":["{\"selector\": {\"Type\": type, \"Owner.Hospital\": hospital},\"fields\": [\"ID\",\"Available\"]}"]}'
 ```
@@ -220,7 +220,7 @@ const hospital;
 ```
 
 ```bash
-kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a='{\"selector\": {\"Owner.Hospital\": hospital, \"Owner.Department\": department},\"fields\": [\"ID\",\"Name\"]}'
+kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a="{\"selector\": {\"Owner.Hospital\": hospital, \"Owner.Department\": department},\"fields\": [\"ID\",\"Name\"]}"
 
 peer chaincode query -C mychannel -n ledger -c '{"function":"QueryAssets","Args":["{\"selector\": {\"Owner.Hospital\": hospital, \"Owner.Department\": department},\"fields\": [\"ID\",\"Name\"]}"]}'
 ```
@@ -247,7 +247,7 @@ peer chaincode query -C mychannel -n ledger -c '{"function":"QueryAssets","Args"
 ```
 
 ```bash
-kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a='{\"selector\": {\"Available\": false},\"fields\": [\"ID\",\"Name\",\"LastUpdate\"],\"sort\": [{\"LastUpdate\": \"asc\"}]}'
+kubectl hlf chaincode query --config=resources/network.yaml     --user=admin --peer=org1-peer0.default     --chaincode=asset --channel=demo     --fcn=QueryAssets -a="{\"selector\": {\"Available\": false},\"fields\": [\"ID\",\"Name\",\"LastUpdate\"],\"sort\": [{\"LastUpdate\": \"asc\"}]}"
 
 peer chaincode query -C mychannel -n ledger -c '{"function":"QueryAssets","Args":["{\"selector\": {\"Available\": false},\"fields\": [\"ID\",\"Name\",\"LastUpdate\"],\"sort\": [{\"LastUpdate\": \"asc\"}]}"]}'
 ```

@@ -1,7 +1,6 @@
 # Modified Tutorial
-Modified tutorial to better fit the needs of the project. You should run all commands, even after you've torn down the previous network. This tutorial will not work on Mac, I don't have a modified tutorial for that yet.
-
-Just run all commands in order, and you should be good to go.
+Changed ``docker push ...`` to ``kind load docker-image ...`` to avoid pushing the image to a registry (which is pointless in our case). 
+Also added creator attributes when registering/enrolling organization 1
 
 If something goes wrong, there is a high probability that just removing the resources and running the commands again will fix the issue. You can remove the resources with the following command:
 
@@ -167,6 +166,20 @@ export CA_IMAGE=hyperledger/fabric-ca
 export CA_VERSION=1.5.6-beta2
 ```
 
+### Environment Variables for ARM (Mac M1)
+
+```bash
+export PEER_IMAGE=bswamina/fabric-peer
+export PEER_VERSION=2.4.6
+
+export ORDERER_IMAGE=bswamina/fabric-orderer
+export ORDERER_VERSION=2.4.6
+
+export CA_IMAGE=hyperledger/fabric-ca
+export CA_VERSION=1.5.6-beta2
+
+```
+
 ### Configure Internal DNS
 
 ```bash
@@ -208,47 +221,32 @@ EOF
 
 ```
 
-### Deploy a certificate authority for Org1MSP, Org2MSP and OrdererMSP
+### Deploy a certificate authority for Org1MSP
 
 ```bash
 
 kubectl hlf ca create  --image=$CA_IMAGE --version=$CA_VERSION --storage-class=standard --capacity=1Gi --name=org1-ca \
     --enroll-id=enroll --enroll-pw=enrollpw --hosts=org1-ca.localho.st --istio-port=443
 
-kubectl hlf ca create  --image=$CA_IMAGE --version=$CA_VERSION --storage-class=standard --capacity=1Gi --name=org2-ca \
-    --enroll-id=enroll --enroll-pw=enrollpw --hosts=org2-ca.localho.st --istio-port=443
-
-kubectl hlf ca create  --image=$CA_IMAGE --version=$CA_VERSION --storage-class=standard --capacity=1Gi --name=ord-ca \
-    --enroll-id=enroll --enroll-pw=enrollpw --hosts=ord-ca.localho.st --istio-port=443
-
 kubectl wait --timeout=180s --for=condition=Running fabriccas.hlf.kungfusoftware.es --all
 ```
 
-Check that the certification authority is deployed and works (it should return the CA certificates):
+Check that the certification authority is deployed and works:
 
 ```bash
 curl -k https://org1-ca.localho.st:443/cainfo
-curl -k https://org2-ca.localho.st:443/cainfo
-curl -vik https://ord-ca.localho.st:443/cainfo
 ```
 
-Register a user in the certification authority of the peer organization (Org1MSP, Org2MSP and OrdererMSP)
+Register a user in the certification authority of the peer organization (Org1MSP)
 
 ```bash
 # register user in CA for peers
 kubectl hlf ca register --name=org1-ca --user=peer --secret=peerpw --type=peer \
  --enroll-id enroll --enroll-secret=enrollpw --mspid Org1MSP
 
-# register user in CA for peers
-kubectl hlf ca register --name=org2-ca --user=peer --secret=peerpw --type=peer \
- --enroll-id enroll --enroll-secret=enrollpw --mspid Org2MSP
-
-kubectl hlf ca register --name=ord-ca --user=orderer --secret=ordererpw \
-    --type=orderer --enroll-id enroll --enroll-secret=enrollpw --mspid=OrdererMSP --ca-url="https://ord-ca.localho.st:443"
-
 ```
 
-### Deploy peers for Org1MSP, Org2MSP and OrdererMSP
+### Deploy two peers for Org1MSP
 
 ```bash
 kubectl hlf peer create --statedb=couchdb --image=$PEER_IMAGE --version=$PEER_VERSION --storage-class=standard --enroll-id=peer --mspid=Org1MSP \
@@ -260,14 +258,99 @@ kubectl hlf peer create --statedb=couchdb --image=$PEER_IMAGE --version=$PEER_VE
         --enroll-pw=peerpw --capacity=5Gi --name=org1-peer1 --ca-name=org1-ca.default \
         --hosts=peer1-org1.localho.st --istio-port=443
 
+kubectl wait --timeout=180s --for=condition=Running fabricpeers.hlf.kungfusoftware.es --all
+```
+
+Check that the peer is deployed and works:
+
+```bash
+openssl s_client -connect peer0-org1.localho.st:443
+openssl s_client -connect peer1-org1.localho.st:443
+```
+
+### Deploy a certificate authority for Org2MSP
+
+```bash
+
+kubectl hlf ca create  --image=$CA_IMAGE --version=$CA_VERSION --storage-class=standard --capacity=1Gi --name=org2-ca \
+    --enroll-id=enroll --enroll-pw=enrollpw --hosts=org2-ca.localho.st --istio-port=443
+
+kubectl wait --timeout=180s --for=condition=Running fabriccas.hlf.kungfusoftware.es --all
+```
+
+Check that the certification authority is deployed and works:
+
+```bash
+curl -k https://org2-ca.localho.st:443/cainfo
+```
+
+Register a user in the certification authority of the peer organization (Org2MSP)
+
+```bash
+# register user in CA for peers
+kubectl hlf ca register --name=org2-ca --user=peer --secret=peerpw --type=peer \
+ --enroll-id enroll --enroll-secret=enrollpw --mspid Org2MSP
+
+```
+
+### Deploy two peers for Org2MSP
+
+```bash
 kubectl hlf peer create --statedb=couchdb --image=$PEER_IMAGE --version=$PEER_VERSION --storage-class=standard --enroll-id=peer --mspid=Org2MSP \
         --enroll-pw=peerpw --capacity=5Gi --name=org2-peer0 --ca-name=org2-ca.default \
         --hosts=peer0-org2.localho.st --istio-port=443
+
 
 kubectl hlf peer create --statedb=couchdb --image=$PEER_IMAGE --version=$PEER_VERSION --storage-class=standard --enroll-id=peer --mspid=Org2MSP \
         --enroll-pw=peerpw --capacity=5Gi --name=org2-peer1 --ca-name=org2-ca.default \
         --hosts=peer1-org2.localho.st --istio-port=443
 
+kubectl wait --timeout=180s --for=condition=Running fabricpeers.hlf.kungfusoftware.es --all
+```
+
+Check that the peer is deployed and works:
+
+```bash
+openssl s_client -connect peer0-org2.localho.st:443
+openssl s_client -connect peer1-org2.localho.st:443
+```
+
+## Deploy an `Orderer` organization
+
+To deploy an `Orderer` organization we have to:
+
+1. Create a certification authority
+2. Register user `orderer` with password `ordererpw`
+3. Create orderers
+
+### Create the certification authority
+
+```bash
+
+kubectl hlf ca create  --image=$CA_IMAGE --version=$CA_VERSION --storage-class=standard --capacity=1Gi --name=ord-ca \
+    --enroll-id=enroll --enroll-pw=enrollpw --hosts=ord-ca.localho.st --istio-port=443
+
+kubectl wait --timeout=180s --for=condition=Running fabriccas.hlf.kungfusoftware.es --all
+
+```
+
+Check that the certification authority is deployed and works:
+
+```bash
+curl -vik https://ord-ca.localho.st:443/cainfo
+```
+
+### Register user `orderer`
+
+```bash
+kubectl hlf ca register --name=ord-ca --user=orderer --secret=ordererpw \
+    --type=orderer --enroll-id enroll --enroll-secret=enrollpw --mspid=OrdererMSP --ca-url="https://ord-ca.localho.st:443"
+
+```
+
+### Deploy orderer
+
+```bash
 
 kubectl hlf ordnode create --image=$ORDERER_IMAGE --version=$ORDERER_VERSION \
     --storage-class=standard --enroll-id=orderer --mspid=OrdererMSP \
@@ -283,26 +366,18 @@ kubectl hlf ordnode create --image=$ORDERER_IMAGE --version=$ORDERER_VERSION \
     --storage-class=standard --enroll-id=orderer --mspid=OrdererMSP \
     --enroll-pw=ordererpw --capacity=2Gi --name=ord-node2 --ca-name=ord-ca.default \
     --hosts=orderer2-ord.localho.st --istio-port=443
-```
 
-You don't necessarily have to run the command below, you can also just wait a while and check ``kubectl get pods`` if all the nodes are running. The command below will wait for the nodes to be running (this can take a while, like 3-10 minutes, be patient):
 
-```bash
-kubectl wait --timeout=180s --for=condition=Running fabricpeers.hlf.kungfusoftware.es --all
 kubectl wait --timeout=180s --for=condition=Running fabricorderernodes.hlf.kungfusoftware.es --all
 ```
 
-# MAKE SURE TO WAIT FOR THE NODES TO BE RUNNING BEFORE CONTINUING!!!
-Just wait for a bit if the above command says something like: timed out waiting for the condition. It should eventually say that all nodes are running.
-
-Check that the peers and orderer are deployed and work (this step usually doesnt work for me, but idk. If this returns something like cert not found, it's fine):
+Check that the orderer is running:
 
 ```bash
-openssl s_client -connect peer0-org1.localho.st:443
-openssl s_client -connect peer1-org1.localho.st:443
-openssl s_client -connect peer0-org2.localho.st:443
-openssl s_client -connect peer1-org2.localho.st:443
+kubectl get pods
+```
 
+```bash
 openssl s_client -connect orderer0-ord.localho.st:443
 openssl s_client -connect orderer1-ord.localho.st:443
 openssl s_client -connect orderer2-ord.localho.st:443
