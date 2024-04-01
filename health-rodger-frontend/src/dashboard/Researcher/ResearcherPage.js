@@ -89,11 +89,11 @@ export default function ResearcherPage() {
           return `{"selector": {"Owner.Hospital": "${hospital}"}, "fields": ["ID", "Name", "Owner.Department", "Owner.ContactPerson"]}`;
         }}
       />
-      <GenericNoParameterQuery
+      {/* <GenericNoParameterQuery
         title={"11. List the devices that have been unavailable the longest"}
         headers={["ID", "Name", "LastUpdate"]}
         queryString={`{"selector": {"Available": false}, "fields": ["ID", "Name", "LastUpdate"], "sort": [{"LastUpdate": "asc"}]`}
-      />
+      /> */}
     </>
   );
 }
