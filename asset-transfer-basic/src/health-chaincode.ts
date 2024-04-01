@@ -184,10 +184,9 @@ export class HealthAssetTransferContract extends Contract {
     );
 
     // save to db
-    let indexName = "indexOwner";
+    let indexName = "lastUpdate";
     let indexKey = await ctx.stub.createCompositeKey(indexName, [
-      asset.ID,
-      ownerClientID,
+      asset.LastUpdate.toString(),
     ]);
 
     await ctx.stub.putState(indexKey, Buffer.from("\u0000"));
@@ -282,11 +281,12 @@ export class HealthAssetTransferContract extends Contract {
     });
     ctx.stub.setEvent("DeleteAsset", Buffer.from(eventPayload));
 
-    return ctx.stub.deleteState(id);
+    await ctx.stub.deleteState(id);
 
+    const assetJSON = JSON.parse(asset);
     // delete the index
-    let indexName = "indexOwner";
-    let indexKey = ctx.stub.createCompositeKey(indexName, [id, clientID]);
+    let indexName = "lastUpdate";
+    let indexKey = ctx.stub.createCompositeKey(indexName, [assetJSON.LastUpdate.toString()]);
     if (!indexKey) {
       throw new Error("Failed to create createCompositeKey");
     }
