@@ -135,10 +135,11 @@ export class HealthAssetTransferContract extends Contract {
     department: string,
     contactPerson: string
   ): Promise<void> {
-    // Atrtribute based access control
-    const err = ctx.clientIdentity.assertAttributeValue("abac.creator", "true");
-    if (err) {
-      throw new Error(`Client is not authorized to create an asset`);
+    const userRole = ctx.clientIdentity.getAttributeValue('role');
+
+    // Ensure that only users with a role of 'hospital' can create assets
+    if (userRole !== 'hospital') {
+      throw new Error('Client is not authorized to create assets. Only users with a role of "hospital" are allowed.');
     }
 
     const exists = await this.AssetExists(ctx, id);

@@ -55,14 +55,49 @@ export default function HospitalPage() {
 
   const fetchEntries = async () => {
     try {
-      const response = await axios.get('http://localhost:3003/evaluate', {
-        params: {
-          fcn: 'GetAllAssets'
-        }
+      // Retrieve the username from local storage
+      const username = localStorage.getItem('username');
+      
+      // Check if the username exists
+      if (!username) {
+        throw new Error('No username found in local storage.');
+      }
+
+      // Make the HTTP post request with the "x-user" header
+      const response = await axios.post('http://localhost:3003/evaluate', {
+        fcn: 'GetAllAssets',
+      }, {
+        headers: {
+          'x-user': username, // Include the "x-user" header
+        },
       });
-      setEntries(response.data);
+
+  
+      // Assuming the response data is the array of entries
+      if (Array.isArray(response.data)) {
+        setEntries(response.data); // Update your entries state with the response
+        console.log('Entries fetched:', response.data); // Logging the fetched entries
+      } else {
+        throw new Error('Invalid data format received from the server.');
+      }
     } catch (error) {
-      console.error('Error fetching entries:', error);
+      // Handle errors that occur during the API request
+      console.error('Error fetching entries:', error.response || error.message);
+  
+      // If it's an Axios error, you can access the detailed error response
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error(error.response.data);
+        console.error(error.response.status);
+        console.error(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error('Error', error.message);
+      }
     }
   };
 
