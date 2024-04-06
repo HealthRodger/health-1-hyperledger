@@ -10,23 +10,8 @@ Before running the scripts, ensure you have the following dependencies installed
 
 ## Running the network
 
-Start by setting up the environment (Kubernetes and Istio) by running the following command:
+Follow the instructions in the [Tutorial](tutorial-ledger-queries.md) to set up the network.
 
-```
-./setup_environment.sh
-```
-
-Before proceeding with the network setup, check if the environment is up and running:
-
-```
-kubectl wait --for=condition=available --timeout=600s deployment --all -n istio-system
-```
-
-Next, run the network setup script:
-
-```
-./setup_network.sh
-```
 This script will set up a HyperLedger Fabric network with:
 - Two peer organizations with a CA each
   - One peer per organization
@@ -38,3 +23,11 @@ Finally, you can check if the pods are running with:
 ```
 kubectl get pods
 ```
+
+## Development
+
+Using the default network configuration, the following scripts are available as QoL tools:
+
+- `./deployCC.sh`: Deploys the current chaincode to the network
+- `./test-network.sh`: Runs shallow network tests to ensure the network is running and chaincode is performing as expected
+- `./sample-commands.sh`: Contains sample commands to interact with the network

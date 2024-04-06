@@ -13,111 +13,21 @@ import stringify from "json-stringify-deterministic";
 import sortKeysRecursive from "sort-keys-recursive";
 import { Asset } from "./asset";
 
-// type AssetType = {
-//     ID: string;
-//     Name: string;
-//     Type: string;
-//     IpAddress: string;
-//     Available: boolean;
-//     LastUpdate: number;
-//     IsWearable: boolean;
-//     GPSLocation: string;
-//     Owner: OwnerType;
-// }
-
-// type OwnerType = {
-//     Hospital: string;
-//     Department: string;
-//     ContactPerson: string;
-//     OwnerClientID: string;
-// }
+const VERSION = "1.0.0";
+const CONTRACT_NAME = "HealthAssetTransferContract";
 
 @Info({
   title: "Health Chaincode",
   description: "Smart contract for exchange of health/hospital assets",
 })
 export class HealthAssetTransferContract extends Contract {
-  @Transaction()
-  public async InitLedger(ctx: Context): Promise<void> {
-    const assets: Asset[] = [
-      {
-        ID: "monitor1",
-        Name: "Health Monitor",
-        Type: "Walker",
-        IpAddress: "0.0.0.0",
-        Available: false,
-        LastUpdate: 1710719049, // Unix timestamp
-        IsWearable: false,
-        GPSLocation: "0,0",
-        Owner: {
-          Hospital: "Hospital1",
-          Department: "Department1",
-          ContactPerson: "Person1",
-          OwnerClientID: "fake-client-id-1",
-        },
-      },
-      {
-        ID: "monitor2",
-        Name: "Health Monitor",
-        Type: "Wearable",
-        IpAddress: "0.0.0.0",
-        Available: true,
-        LastUpdate: 1710719049, // Unix timestamp
-        IsWearable: true,
-        GPSLocation: "0,0",
-        Owner: {
-          Hospital: "Hospital2",
-          Department: "Department2",
-          ContactPerson: "Person2",
-          OwnerClientID: "fake-client-id-1",
-        },
-      },
-      {
-        ID: "monitor3",
-        Name: "Health Monitor",
-        Type: "Wearable",
-        IpAddress: "0.0.0.0",
-        Available: true,
-        LastUpdate: 1710719049, // Unix timestamp
-        IsWearable: true,
-        GPSLocation: "0,0",
-        Owner: {
-          Hospital: "Hospital3",
-          Department: "Department3",
-          ContactPerson: "Person3",
-          OwnerClientID: "fake-client-id-1",
-        },
-      },
-      {
-        ID: "smartwatch1",
-        Name: "Apple Watch SE",
-        Type: "Wearable",
-        IpAddress: "0.0.0.0",
-        Available: true,
-        LastUpdate: 1710719049, // Unix timestamp
-        IsWearable: true,
-        GPSLocation: "0,0",
-        Owner: {
-          Hospital: "Hospital4",
-          Department: "Department4",
-          ContactPerson: "Person4",
-          OwnerClientID: "fake-client-id-1",
-        },
-      },
-    ];
-
-    for (const asset of assets) {
-      asset.docType = "asset";
-      // example of how to write to world state deterministically
-      // use convetion of alphabetic order
-      // we insert data in alphabetic order using 'json-stringify-deterministic' and 'sort-keys-recursive'
-      // when retrieving data, in any lang, the order of data will be the same and consequently also the corresonding hash
-      await ctx.stub.putState(
-        asset.ID,
-        Buffer.from(stringify(sortKeysRecursive(asset)))
-      );
-      console.info(`Asset ${asset.ID} initialized`);
-    }
+  @Transaction(false)
+  @Returns("string")
+  public async GetContractInfo(ctx: Context): Promise<string> {
+    return stringify({
+      contractName: CONTRACT_NAME,
+      version: VERSION,
+    });
   }
 
   // CreateAsset issues a new asset to the world state with given details.
@@ -152,7 +62,8 @@ export class HealthAssetTransferContract extends Contract {
 
     const ownerClientID = ctx.clientIdentity.getID();
 
-    const asset = {
+    const asset: Asset = {
+      docType: "asset",
       ID: id,
       Name: name,
       Type: type,
@@ -221,7 +132,8 @@ export class HealthAssetTransferContract extends Contract {
     }
 
     // overwriting original asset with new asset
-    const updatedAsset = {
+    const updatedAsset: Asset = {
+      docType: "asset",
       ID: id,
       Name: name,
       Type: type,
@@ -286,7 +198,9 @@ export class HealthAssetTransferContract extends Contract {
     const assetJSON = JSON.parse(asset);
     // delete the index
     let indexName = "lastUpdate";
-    let indexKey = ctx.stub.createCompositeKey(indexName, [assetJSON.LastUpdate.toString()]);
+    let indexKey = ctx.stub.createCompositeKey(indexName, [
+      assetJSON.LastUpdate.toString(),
+    ]);
     if (!indexKey) {
       throw new Error("Failed to create createCompositeKey");
     }
