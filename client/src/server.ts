@@ -12,6 +12,7 @@ import FabricCAServices = require("fabric-ca-client")
 import express = require("express")
 
 const log = new Logger({ name: "assets-api" })
+const cors = require('cors');
 
 
 async function main() {
@@ -84,6 +85,12 @@ async function main() {
     const network = gateway.getNetwork(config.channelName);
     const contract = network.getContract(config.chaincodeName);
     const app = express();
+    // Enable CORS and allow the custom "x-user" header
+    app.use(cors({
+        origin: '*', // You might want to specify the exact origin for security
+        methods: ['GET', 'POST', 'OPTIONS'], // Add any other methods needed
+        allowedHeaders: ['Content-Type', 'x-user'],
+    }));
     app.use(express.json());
     app.use((req, res, next) => {
         res.header("Access-Control-Allow-Origin", "*");
@@ -92,52 +99,84 @@ async function main() {
     });
     const users = {}
     app.post("/signup", async (req, res) => {
-        const { username, password } = req.body
-        let identityFound = null
+        const { username, password, role } = req.body; // Include role in the destructured body
+    
+        // Validate the provided role
+        if (!['researcher', 'hospital'].includes(role)) {
+            return res.status(400).send("Invalid role specified. Must be 'researcher' or 'hospital'.");
+        }
+    
+        let identityFound = null;
         try {
-            identityFound = await identityService.getOne(username, registrar)
+            identityFound = await identityService.getOne(username, registrar);
         } catch (e) {
-            log.info("Identity not found, registering", e)
+            log.info("Identity not found, registering", e);
         }
         if (identityFound) {
-            res.status(400)
-            res.send("Username already taken")
-            return
+            res.status(400).send("Username already taken");
+            return;
         }
+    
         await fabricCAServices.register({
             enrollmentID: username,
             enrollmentSecret: password,
-            affiliation: "",
-            role: "client",
-            attrs: [],
-            maxEnrollments: -1
-        }, registrar)
-        res.send("OK")
-    })
+            affiliation: "", // Specify affiliation if applicable
+            role: "client", // This is usually the role within the CA and not your application role
+            attrs: [
+                {
+                    name: 'role', // Use the attribute name that your chaincode will check
+                    value: role,
+                    ecert: true, // Include this attribute in the enrollment certificate
+                },
+            ],
+            maxEnrollments: -1,
+        }, registrar);
+    
+        res.send("OK");
+    });
     app.post("/login", async (req, res) => {
-        const { username, password } = req.body
-        let identityFound = null
+        const { username, password } = req.body;
+    
+        // Try to find the identity in the CA
+        let identityFound = null;
         try {
-            identityFound = await identityService.getOne(username, registrar)
+            identityFound = await identityService.getOne(username, registrar);
         } catch (e) {
-            log.info("Identity not found, registering", e)
-            res.status(400)
-            res.send("Username not found")
-            return
+            log.info("Identity not found", e);
+            return res.status(400).send("Username not found");
         }
-        const r = await fabricCAServices.enroll({
-            enrollmentID: username,
-            enrollmentSecret: password,
-        })
-        users[username] = r
-        res.send("OK")
-    })
+    
+        // Proceed with enrollment if the identity is found
+        try {
+            const enrollmentResponse = await fabricCAServices.enroll({
+                enrollmentID: username,
+                enrollmentSecret: password,
+            });
+    
+            // Enrollment was successful
+            console.log("Login response:");
+            console.log(enrollmentResponse);
+    
+            // Store user information (consider security implications of what is stored)
+            users[username] = enrollmentResponse;
+    
+            res.send("OK");
+        } catch (e) {
+            // Enrollment failed - likely due to incorrect credentials
+            log.error("Failed to enroll user", e);
+            res.status(401).send("Login failed: Incorrect username or password");
+        }
+    });
     app.use(async (req, res, next) => {
         (req as any).contract = contract
+        console.log(contract)
         try {
             log.info(Object.keys(users))
             const user = req.headers["x-user"] as string
+            console.log(user)
+            console.log(users)
             if (user && users[user]) {
+                console.log("a")
                 log.info(`utilizando usuario ${user}`)
                 const connectOptions = await newConnectOptions(
                     grpcConn,

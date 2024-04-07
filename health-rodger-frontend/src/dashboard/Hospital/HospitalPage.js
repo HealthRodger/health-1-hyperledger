@@ -50,10 +50,23 @@ export default function HospitalPage() {
         convertedData.department,
         convertedData.contactPerson,
       ];
+      
+      // Retrieve the username from local storage
+      const username = localStorage.getItem('username');
+      
+      // Check if the username exists
+      if (!username) {
+        throw new Error('No username found in local storage.');
+      }
 
+      // Make the HTTP post request with the "x-user" header
       const response = await axios.post('http://localhost:3003/submit', {
         fcn: 'CreateAsset',
         args: args,
+      }, {
+        headers: {
+          'x-user': username, // Include the "x-user" header
+        },
       });
 
       if (response.status === 200) {
