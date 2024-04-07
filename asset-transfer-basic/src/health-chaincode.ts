@@ -13,110 +13,21 @@ import stringify from "json-stringify-deterministic";
 import sortKeysRecursive from "sort-keys-recursive";
 import { Asset } from "./asset";
 
-// type AssetType = {
-//     ID: string;
-//     Name: string;
-//     Type: string;
-//     IpAddress: string;
-//     Available: boolean;
-//     LastUpdate: number;
-//     IsWearable: boolean;
-//     GPSLocation: string;
-//     Owner: OwnerType;
-// }
-
-// type OwnerType = {
-//     Hospital: string;
-//     Department: string;
-//     ContactPerson: string;
-// }
+const VERSION = "1.0.0";
+const CONTRACT_NAME = "HealthAssetTransferContract";
 
 @Info({
   title: "Health Chaincode",
   description: "Smart contract for exchange of health/hospital assets",
 })
 export class HealthAssetTransferContract extends Contract {
-  @Transaction()
-  public async InitLedger(ctx: Context): Promise<void> {
-    const assets: Asset[] = [
-      {
-        ID: "monitor1",
-        Name: "Health Monitor",
-        Type: "Walker",
-        IpAddress: "0.0.0.0",
-        Available: false,
-        LastUpdate: 1710719049, // Unix timestamp
-        IsWearable: false,
-        GPSLocation: "0,0",
-        Owner: {
-          Hospital: "Hospital1",
-          Department: "Department1",
-          ContactPerson: "Person1",
-          OwnerClientID: "fake-client-id-1",
-        },
-      },
-      {
-        ID: "monitor2",
-        Name: "Health Monitor",
-        Type: "Wearable",
-        IpAddress: "0.0.0.0",
-        Available: true,
-        LastUpdate: 1710719049, // Unix timestamp
-        IsWearable: true,
-        GPSLocation: "0,0",
-        Owner: {
-          Hospital: "Hospital2",
-          Department: "Department2",
-          ContactPerson: "Person2",
-          OwnerClientID: "fake-client-id-1",
-        },
-      },
-      {
-        ID: "monitor3",
-        Name: "Health Monitor",
-        Type: "Wearable",
-        IpAddress: "0.0.0.0",
-        Available: true,
-        LastUpdate: 1710719049, // Unix timestamp
-        IsWearable: true,
-        GPSLocation: "0,0",
-        Owner: {
-          Hospital: "Hospital3",
-          Department: "Department3",
-          ContactPerson: "Person3",
-          OwnerClientID: "fake-client-id-1",
-        },
-      },
-      {
-        ID: "smartwatch1",
-        Name: "Apple Watch SE",
-        Type: "Wearable",
-        IpAddress: "0.0.0.0",
-        Available: true,
-        LastUpdate: 1710719049, // Unix timestamp
-        IsWearable: true,
-        GPSLocation: "0,0",
-        Owner: {
-          Hospital: "Hospital4",
-          Department: "Department4",
-          ContactPerson: "Person4",
-          OwnerClientID: "fake-client-id-1",
-        },
-      },
-    ];
-
-    for (const asset of assets) {
-      asset.docType = "asset";
-      // example of how to write to world state deterministically
-      // use convetion of alphabetic order
-      // we insert data in alphabetic order using 'json-stringify-deterministic' and 'sort-keys-recursive'
-      // when retrieving data, in any lang, the order of data will be the same and consequently also the corresonding hash
-      await ctx.stub.putState(
-        asset.ID,
-        Buffer.from(stringify(sortKeysRecursive(asset)))
-      );
-      console.info(`Asset ${asset.ID} initialized`);
-    }
+  @Transaction(false)
+  @Returns("string")
+  public async GetContractInfo(ctx: Context): Promise<string> {
+    return stringify({
+      contractName: CONTRACT_NAME,
+      version: VERSION,
+    });
   }
 
   // CreateAsset issues a new asset to the world state with given details.
@@ -136,8 +47,11 @@ export class HealthAssetTransferContract extends Contract {
     contactPerson: string
   ): Promise<void> {
     // Atrtribute based access control
-    const err = ctx.clientIdentity.assertAttributeValue("abac.creator", "true");
-    if (err) {
+    const attrRes = ctx.clientIdentity.assertAttributeValue(
+      "abac.creator",
+      "true"
+    );
+    if (!attrRes) {
       throw new Error(`Client is not authorized to create an asset`);
     }
 
@@ -146,7 +60,10 @@ export class HealthAssetTransferContract extends Contract {
       throw new Error(`The asset ${id} already exists`);
     }
 
-    const asset = {
+    const ownerClientID = ctx.clientIdentity.getID();
+
+    const asset: Asset = {
+      docType: "asset",
       ID: id,
       Name: name,
       Type: type,
@@ -159,16 +76,16 @@ export class HealthAssetTransferContract extends Contract {
         Hospital: hospital,
         Department: department,
         ContactPerson: contactPerson,
-        OwnerClientID: ctx.clientIdentity.getID(), // get the client ID from the transaction context -> this is the client ID of the creator
+        OwnerClientID: ownerClientID, // get the client ID from the transaction context -> this is the client ID of the creator
       },
     };
 
     // emit event
-    const eventPayload = JSON.stringify({
-        asset: asset,
-        requestedBy: ctx.clientIdentity.getID(),
-        action: 'Write'
-    })
+    const eventPayload = stringify({
+      asset: asset,
+      requestedBy: ownerClientID,
+      action: "Write",
+    });
     ctx.stub.setEvent("CreateAsset", Buffer.from(eventPayload));
 
     // we insert data in alphabetic order using 'json-stringify-deterministic' and 'sort-keys-recursive'
@@ -176,6 +93,14 @@ export class HealthAssetTransferContract extends Contract {
       id,
       Buffer.from(stringify(sortKeysRecursive(asset)))
     );
+
+    // save to db
+    let indexName = "lastUpdate";
+    let indexKey = await ctx.stub.createCompositeKey(indexName, [
+      asset.LastUpdate.toString(),
+    ]);
+
+    await ctx.stub.putState(indexKey, Buffer.from("\u0000"));
   }
 
   // UpdateAsset updates an existing asset in the world state with provided parameters.
@@ -199,15 +124,16 @@ export class HealthAssetTransferContract extends Contract {
       throw new Error(`The asset ${id} does not exist`);
     }
 
+    const clientID = ctx.clientIdentity.getID();
+
     const clientIsOwner = await this.ClientIsOwner(ctx, id);
     if (!clientIsOwner) {
-      throw new Error(
-        `The asset ${id} is not owned by the client ${ctx.clientIdentity.getID()}`
-      );
+      throw new Error(`The asset ${id} is not owned by the client ${clientID}`);
     }
 
     // overwriting original asset with new asset
-    const updatedAsset = {
+    const updatedAsset: Asset = {
+      docType: "asset",
       ID: id,
       Name: name,
       Type: type,
@@ -220,16 +146,16 @@ export class HealthAssetTransferContract extends Contract {
         Hospital: hospital,
         Department: department,
         ContactPerson: contactPerson,
-        OwnerClientID: ctx.clientIdentity.getID(), // could also be taken from the original asset
+        OwnerClientID: clientID, // could also be taken from the original asset
       },
     };
 
     // emit event
-    const eventPayload = JSON.stringify({
-        asset: updatedAsset,
-        requestedBy: ctx.clientIdentity.getID(),
-        action: 'Write'
-    })
+    const eventPayload = stringify({
+      asset: updatedAsset,
+      requestedBy: clientID,
+      action: "Write",
+    });
     ctx.stub.setEvent("UpdateAsset", Buffer.from(eventPayload));
 
     // we insert data in alphabetic order using 'json-stringify-deterministic' and 'sort-keys-recursive'
@@ -242,28 +168,44 @@ export class HealthAssetTransferContract extends Contract {
   // DeleteAsset deletes an given asset from the world state.
   @Transaction()
   public async DeleteAsset(ctx: Context, id: string): Promise<void> {
+    if (!id) {
+      throw new Error("Asset name must not be empty");
+    }
+
     const exists = await this.AssetExists(ctx, id);
     if (!exists) {
       throw new Error(`The asset ${id} does not exist`);
     }
 
+    const clientID = ctx.clientIdentity.getID();
+
     const clientIsOwner = await this.ClientIsOwner(ctx, id);
     if (!clientIsOwner) {
-      throw new Error(
-        `The asset ${id} is not owned by the client ${ctx.clientIdentity.getID()}`
-      );
+      throw new Error(`The asset ${id} is not owned by the client ${clientID}`);
     }
 
     // emit event
     const asset = await this.ReadAsset(ctx, id);
-    const eventPayload = JSON.stringify({
-        asset: asset,
-        requestedBy: ctx.clientIdentity.getID(),
-        action: 'Write'
-    })
+    const eventPayload = stringify({
+      asset: asset,
+      requestedBy: clientID,
+      action: "Write",
+    });
     ctx.stub.setEvent("DeleteAsset", Buffer.from(eventPayload));
 
-    return ctx.stub.deleteState(id);
+    await ctx.stub.deleteState(id);
+
+    const assetJSON = JSON.parse(asset);
+    // delete the index
+    let indexName = "lastUpdate";
+    let indexKey = ctx.stub.createCompositeKey(indexName, [
+      assetJSON.LastUpdate.toString(),
+    ]);
+    if (!indexKey) {
+      throw new Error("Failed to create createCompositeKey");
+    }
+    // Delete index entry to state
+    await ctx.stub.deleteState(indexKey);
   }
 
   // TransferAsset updates the owner field of asset with given id in the world state, and returns the old owner.
@@ -291,11 +233,11 @@ export class HealthAssetTransferContract extends Contract {
     asset.Owner.OwnerClientID = newOwner;
 
     // emit event
-    const eventPayload = JSON.stringify({
-        asset: asset,
-        requestedBy: ctx.clientIdentity.getID(),
-        action: 'Write'
-    })
+    const eventPayload = stringify({
+      asset: asset,
+      requestedBy: ctx.clientIdentity.getID(),
+      action: "Write",
+    });
     ctx.stub.setEvent("TransferAsset", Buffer.from(eventPayload));
 
     // we insert data in alphabetic order using 'json-stringify-deterministic' and 'sort-keys-recursive'
@@ -315,11 +257,11 @@ export class HealthAssetTransferContract extends Contract {
     }
 
     // emit event for read
-    const eventPayload = JSON.stringify({
-        asset: assetJSON,
-        requestedBy: ctx.clientIdentity.getID(),
-        action: 'Read'
-    })
+    const eventPayload = stringify({
+      asset: assetJSON,
+      requestedBy: ctx.clientIdentity.getID(),
+      action: "Read",
+    });
     ctx.stub.setEvent("ReadAsset", Buffer.from(eventPayload));
 
     return assetJSON.toString();
@@ -348,19 +290,64 @@ export class HealthAssetTransferContract extends Contract {
     }
 
     // emit event for read
-    const eventPayload = JSON.stringify({
-        asset: allResults,
-        requestedBy: ctx.clientIdentity.getID(),
-        action: 'Read'
-    })
+    const eventPayload = stringify({
+      asset: allResults,
+      requestedBy: ctx.clientIdentity.getID(),
+      action: "Read",
+    });
     ctx.stub.setEvent("GetAllAssets", Buffer.from(eventPayload));
-    
-    return JSON.stringify(allResults);
+
+    return stringify(allResults);
+  }
+
+  @Transaction()
+  public async QueryAssets(ctx: Context, queryString: string): Promise<string> {
+    let resultsIterator = await ctx.stub.getQueryResult(queryString);
+    let results = await this.GetAllResults(resultsIterator, false);
+
+    return stringify(results);
+  }
+
+  // Iterator here is of type StateQueryIterator, but contract-api won't import that type
+  private async GetAllResults(
+    iterator: any,
+    isHistory: boolean
+  ): Promise<any[]> {
+    let allResults = [];
+    let res = await iterator.next();
+    while (!res.done) {
+      if (res.value && res.value.value.toString()) {
+        let jsonRes: any = {};
+        console.log(res.value.value.toString("utf8"));
+        if (isHistory && isHistory === true) {
+          jsonRes.TxId = res.value.txId;
+          jsonRes.Timestamp = res.value.timestamp;
+          try {
+            jsonRes.Value = JSON.parse(res.value.value.toString("utf8"));
+          } catch (err) {
+            console.log(err);
+            jsonRes.Value = res.value.value.toString("utf8");
+          }
+        } else {
+          jsonRes.Key = res.value.key;
+          try {
+            jsonRes.Record = JSON.parse(res.value.value.toString("utf8"));
+          } catch (err) {
+            console.log(err);
+            jsonRes.Record = res.value.value.toString("utf8");
+          }
+        }
+        allResults.push(jsonRes);
+      }
+      res = await iterator.next();
+    }
+    iterator.close();
+    return allResults;
   }
 
   // AssetExists returns true when asset with given ID exists in world state.
-//   @Transaction(false)
-//   @Returns("boolean")
+  //   @Transaction(false)
+  //   @Returns("boolean")
   private async AssetExists(ctx: Context, id: string): Promise<boolean> {
     const assetJSON = await ctx.stub.getState(id);
     return assetJSON && assetJSON.length > 0;
