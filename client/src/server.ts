@@ -167,6 +167,42 @@ async function main() {
             res.status(401).send("Login failed: Incorrect username or password");
         }
     });
+    app.post("role_check", async (req, res) => {
+	const { username, role_to_check } = req.body;
+
+	// Try to find the identity in the CA
+	let identityFound = null;
+	try {
+	    identityFound = await identityService.getOne(username, registrar);
+	} catch (e) {
+	    log.info("Identity not found", e);
+	    return res.status(400).send("Username not found");
+	}
+
+	// Proceed with role check if identity is found
+	let roleCheck = null;
+	try {
+	    roleCheck = await identityService.getOne(username, registrar);
+	    
+	    let role = null;
+	    for( attr_list in roleCheck.result.attrs ) {
+		if( attr_list[0].value == "role" ) {
+		    role = attr_list[1].value;
+		}
+	    }
+
+	    if( role == role_to_check ) {
+		res.send("OK");
+	    }
+	    else {
+		res.send("Matching role not found");
+	    }
+	} catch (e) {
+	    // Role check failed
+	    log.error("Role check failed", e);
+	    res.status(401).send("Role check failed");
+	}
+    });
     app.use(async (req, res, next) => {
         (req as any).contract = contract
         console.log(contract)
