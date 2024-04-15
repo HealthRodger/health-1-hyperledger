@@ -37,6 +37,8 @@ export default function LoginPage() {
           localStorage.setItem('username', username); // Save username in local storage
           setNotification('Login successful'); // Set notification message
           setOpen(true); // Show notification
+
+          window.location.reload(); // This will reload the entire page
         } catch (error) {
           console.error('Failed to submit:', error);
           setNotification('Login failed: Incorrect username or password'); // Set notification message

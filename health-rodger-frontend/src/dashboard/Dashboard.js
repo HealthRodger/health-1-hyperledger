@@ -19,6 +19,7 @@ import HospitalPage from './Hospital/HospitalPage';
 import AdminPage from './AdminPage';
 import ResearcherPage from './Researcher/ResearcherPage';
 import LoginPage from './Login/LoginPage';
+import axios from 'axios';
 
 function Copyright(props) {
   return (
@@ -85,6 +86,37 @@ const defaultTheme = createTheme();
 export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
   const [clickedButton, setClickedButton] = React.useState("HospitalPage")
+  const [role, setRole] = React.useState(null);
+
+  React.useEffect(() => {
+    // Get the username somehow, perhaps from local storage or context
+    const username = localStorage.getItem('username');
+    
+
+    axios.post('http://localhost:3003/role_check', {username})
+      .then(response => {
+        console.log(response.data)
+        if (response.data === "admin") {
+          // If role check passes, set the role state
+          setRole("Admin");
+          setClickedButton("AdminPage");
+        }
+        if (response.data === "hospital") {
+          // If role check passes, set the role state
+          setRole("Hospital");
+          setClickedButton("HospitalPage");
+        }
+        if (response.data === "researcher") {
+          // If role check passes, set the role state
+          setRole("Researcher");
+          setClickedButton("ResearcherPage");
+        }
+      })
+      .catch(error => {
+        console.error('Error checking role:', error.response?.data || error.message);
+      });
+  }, []);
+
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -142,7 +174,7 @@ export default function Dashboard() {
           </Toolbar>
           <Divider />
           <List component="nav">
-            <MainListItems setClickedButton={setClickedButton} />
+            <MainListItems setClickedButton={setClickedButton} role = {role} />
             <Divider sx={{ my: 1 }} />
             <SecondaryListItems setClickedButton={setClickedButton} />
           </List>
