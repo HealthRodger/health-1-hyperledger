@@ -1,0 +1,21 @@
+id,name,type,ipAddress,available,lastUpdate,isWearable,gpsLocation,hospital,department,contactPerson
+15004,anaesthetic machine 123,diagnostic,88.101.124.173,true,2013-05-11,false,n/a,simply hospital,Geriatric,Eric Valencia DDS
+63746,x-ray machine 943,medical monitorlaboratory equipment,51.142.30.46,true,2010-07-06,false,n/a,about hospital,Oncology,Mark Smith
+92331,fitness tracker 386,fitness tracker,58.44.144.90,false,2005-09-20,true,"-51.67299, -93.85083",treat hospital,Anesthesiology,Ronald Hale
+88481,biosensor 614,biosensor,57.82.51.86,false,2008-02-25,true,"-7.01258, 86.16768",yeah hospital,ENT,Benjamin Saunders
+84259,smart watch 444,smart watch,7.59.250.113,true,1999-12-08,true,"-59.37176, -167.98326",sister hospital,Anesthesiology,Alice Green
+23130,CT 211,diagnostic,195.138.214.196,true,1997-09-05,false,n/a,property hospital,Psychiatry,Kendra Hill
+67075,glucose meter 499,glucose meter,184.177.195.148,false,2006-01-07,true,"-66.71052, 44.54535",fire hospital,Geriatric,Tammy Woodward
+69644,blood pressure monitor 858,blood pressure monitor,122.104.156.95,false,1997-06-12,true,"-49.94422, 124.63641",situation hospital,Emergency,Daniel Hamilton
+46259,glucose meter 910,glucose meter,79.219.186.45,false,2017-05-15,true,"-83.35556, 176.81373",first hospital,Oncology,Stacey Brown
+71577,ecg monitor 326,ecg monitor,207.86.187.68,false,2009-08-29,true,"14.76058, 165.23714",kid hospital,Oncology,Caleb Howell
+22056,blood pressure monitor 468,blood pressure monitor,87.61.32.44,false,2023-01-26,true,"0.86801, -80.63494",court hospital,Neurology,Monica Fernandez
+74235,glucose meter 130,glucose meter,58.134.123.94,true,1998-02-17,true,"50.71315, -38.19225",character hospital,ENT,Joseph Armstrong
+60450,ecg monitor 514,ecg monitor,36.185.149.102,false,2001-02-04,true,"20.24482, -34.73179",understand hospital,Emergency,Becky Miller
+74542,ventilator 974,diagnostic,121.141.47.0,false,1995-09-24,false,n/a,wind hospital,Emergency,Joshua Jordan
+64983,glucose meter 569,glucose meter,104.92.184.131,true,2020-12-19,true,"20.002, -32.40136",herself hospital,Radiology,Kimberly Jacobson
+57913,PET 436,life support,125.255.177.89,false,2007-08-29,false,n/a,effect hospital,Cardiology,Karen Hughes
+69134,ultrasound 210,other,83.209.128.187,false,1994-07-24,false,n/a,herself hospital,Radiology,Amber Hernandez
+71833,MRI 894,life support,38.176.17.106,true,2014-12-14,false,n/a,consumer hospital,Hematology,Michael Jordan
+34747,CT 981,diagnostic,39.5.158.222,true,2018-11-23,false,n/a,also hospital,Cardiology,Stephanie Phillips
+10654,fitness tracker 941,fitness tracker,100.53.188.103,true,2008-01-24,true,"4.12705, 156.96671",hold hospital,Oncology,Philip Powell
