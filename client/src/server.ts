@@ -13,7 +13,7 @@ import express = require("express")
 
 const log = new Logger({ name: "assets-api" })
 const cors = require('cors');
-
+const revokedUsersFile = 'revokedUsers.json';
 
 async function main() {
     checkConfig()
@@ -69,6 +69,7 @@ async function main() {
 
 
     const adminUser = _.get(networkConfig, `organizations.${config.mspID}.users.${config.hlfUser}`)
+    console.log(adminUser)
     const userCertificate = _.get(adminUser, "cert.pem")
     const userKey = _.get(adminUser, "key.pem")
     if (!userCertificate || !userKey) {
@@ -100,39 +101,143 @@ async function main() {
     const users = {}
     app.post("/signup", async (req, res) => {
         const { username, password, role } = req.body; // Include role in the destructured body
-    
-        // Validate the provided role
-        if (!['researcher', 'hospital'].includes(role)) {
-            return res.status(400).send("Invalid role specified. Must be 'researcher' or 'hospital'.");
+
+        const xUserHeader = req.get('x-user'); // or use req.headers['x-user']
+        console.log(xUserHeader); // Do something with the header value
+        let roleCheck = (await identityService.getOne(xUserHeader, registrar)).result.type;
+        if (roleCheck == 'admin') {
+            // Validate the provided role
+            if (!['researcher', 'hospital'].includes(role)) {
+                return res.status(400).send("Invalid role specified. Must be 'researcher' or 'hospital'.");
+            }
+        
+            let identityFound = null;
+            try {
+                identityFound = await identityService.getOne(username, registrar);
+            } catch (e) {
+                log.info("Identity not found, registering", e);
+            }
+            if (identityFound) {
+                res.status(400).send("Username already taken");
+                return;
+            }
+        
+            await fabricCAServices.register({
+                enrollmentID: username,
+                enrollmentSecret: password,
+                affiliation: "", // Specify affiliation if applicable
+                role: "client", // This is usually the role within the CA and not your application role
+                attrs: [
+                    {
+                        name: 'role', // Use the attribute name that your chaincode will check
+                        value: role,
+                        ecert: true, // Include this attribute in the enrollment certificate
+                    },
+                ],
+                maxEnrollments: -1,
+            }, registrar);
+        
+            res.send("OK");
         }
+        else {
+            log.error("Failed to retrieve users");
+            res.status(500).send("Failed to retrieve users");
+        }
+    });
+    app.get("/users", async (req, res) => {
+        try {
+            const xUserHeader = req.get('x-user'); // or use req.headers['x-user']
+            console.log(xUserHeader); // Do something with the header value
+            let roleCheck = (await identityService.getOne(xUserHeader, registrar)).result.type;
+            if (roleCheck == 'admin') {
+                const identities = await identityService.getAll(registrar); // Fetch all registered identities
+                const revokedUsers = JSON.parse(await fs.readFile(revokedUsersFile, 'utf8') || '{}');
+                const userList = identities.result.identities.map(identity => ({
+                    id: identity.id,
+                    affiliation: identity.affiliation,
+                    attributes: identity.attrs,
+                    type: identity.type,
+                    maxEnrollments: identity.maxEnrollments,
+                    revoked: !!revokedUsers[identity.id]
+                }));
+                res.json(userList);
+                let test = await identityService.getOne("u1", registrar);
+                console.log(test)
+            }
+            else {
+                log.error("Failed to retrieve users");
+                res.status(500).send("Failed to retrieve users");
+            }
+        } catch (error) {
+            log.error("Failed to retrieve users:", error);
+            res.status(500).send("Failed to retrieve users");
+        }
+    });
+    app.post("/revoke", async (req, res) => {
+        const { username } = req.body;
+        try {
+            const xUserHeader = req.get('x-user'); // or use req.headers['x-user']
+            console.log(xUserHeader); // Do something with the header value
+            let roleCheck = (await identityService.getOne(xUserHeader, registrar)).result.type;
+            if (roleCheck == 'admin') {
+                // Revoking the user's certificate
+                const revokeResponse = await fabricCAServices.revoke({
+                    enrollmentID: username,
+                    // You can specify the reason as per RFC 5280
+                    reason: 'cessationOfOperation',
+                }, registrar);
+
+                const revokedUsers = JSON.parse(await fs.readFile(revokedUsersFile, 'utf8') || '{}');
+                revokedUsers[username] = true;
+                await fs.writeFile(revokedUsersFile, JSON.stringify(revokedUsers, null, 2));
+
+                res.json({ message: "User revoked successfully", details: revokeResponse });
+                
+            }
+            else {
+                log.error("Failed to revoke user");
+                res.status(500).send("Failed to revoke user");
+            }
+        } catch (error) {
+            log.error("Failed to revoke user:", error);
+            res.status(500).send(`Failed to revoke user: ${error.message}`);
+        }
+    });
+    app.post("/role_check", async (req, res) => {
+        const { username } = req.body;
     
+        // Try to find the identity in the CA
         let identityFound = null;
         try {
             identityFound = await identityService.getOne(username, registrar);
         } catch (e) {
-            log.info("Identity not found, registering", e);
-        }
-        if (identityFound) {
-            res.status(400).send("Username already taken");
-            return;
+            log.info("Identity not found", e);
+            return res.status(400).send("Username not found");
         }
     
-        await fabricCAServices.register({
-            enrollmentID: username,
-            enrollmentSecret: password,
-            affiliation: "", // Specify affiliation if applicable
-            role: "client", // This is usually the role within the CA and not your application role
-            attrs: [
-                {
-                    name: 'role', // Use the attribute name that your chaincode will check
-                    value: role,
-                    ecert: true, // Include this attribute in the enrollment certificate
-                },
-            ],
-            maxEnrollments: -1,
-        }, registrar);
-    
-        res.send("OK");
+        // Proceed with role check if identity is found
+        let roleCheck = null;
+        try {
+            roleCheck = await identityService.getOne(username, registrar);
+            
+            let role = null;
+            if (roleCheck.result.type == 'admin') {
+                role = 'admin'
+            }
+            else {
+                for(const attr_list of roleCheck.result.attrs ) {
+                    if( attr_list.name == "role" ) {
+                        role = attr_list.value;
+                        console.log(role)
+                    }
+                }
+            }
+            res.send(role);
+        } catch (e) {
+            // Role check failed
+            log.error("Role check failed", e);
+            res.status(401).send("Role check failed");
+        }
     });
     app.post("/login", async (req, res) => {
         const { username, password } = req.body;
