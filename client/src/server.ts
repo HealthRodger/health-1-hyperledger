@@ -13,6 +13,27 @@ import express = require("express")
 
 const log = new Logger({ name: "assets-api" })
 const cors = require('cors');
+const { exec } = require('child_process');
+
+function executeShellCommand(cmd) {
+    return new Promise((resolve, reject) => {
+        exec(cmd, { shell: '/bin/bash' }, (error, stdout, stderr) => { 
+            if (error) {
+                console.error(`exec error: ${error}`);
+                reject(error);
+                return;
+            }
+            if (stderr) {
+                console.error(`stderr: ${stderr}`);
+                reject(new Error(stderr));
+                return;
+            }
+            console.log(`stdout: ${stdout}`);
+            resolve(stdout);
+        });
+    });
+}
+
 
 
 async function main() {
@@ -100,12 +121,12 @@ async function main() {
     const users = {}
     app.post("/signup", async (req, res) => {
         const { username, password, role } = req.body; // Include role in the destructured body
-    
+
         // Validate the provided role
         if (!['researcher', 'hospital'].includes(role)) {
             return res.status(400).send("Invalid role specified. Must be 'researcher' or 'hospital'.");
         }
-    
+
         let identityFound = null;
         try {
             identityFound = await identityService.getOne(username, registrar);
@@ -116,7 +137,7 @@ async function main() {
             res.status(400).send("Username already taken");
             return;
         }
-    
+
         await fabricCAServices.register({
             enrollmentID: username,
             enrollmentSecret: password,
@@ -131,12 +152,12 @@ async function main() {
             ],
             maxEnrollments: -1,
         }, registrar);
-    
+
         res.send("OK");
     });
     app.post("/login", async (req, res) => {
         const { username, password } = req.body;
-    
+
         // Try to find the identity in the CA
         let identityFound = null;
         try {
@@ -145,21 +166,21 @@ async function main() {
             log.info("Identity not found", e);
             return res.status(400).send("Username not found");
         }
-    
+
         // Proceed with enrollment if the identity is found
         try {
             const enrollmentResponse = await fabricCAServices.enroll({
                 enrollmentID: username,
                 enrollmentSecret: password,
             });
-    
+
             // Enrollment was successful
             console.log("Login response:");
             console.log(enrollmentResponse);
-    
+
             // Store user information (consider security implications of what is stored)
             users[username] = enrollmentResponse;
-    
+
             res.send("OK");
         } catch (e) {
             // Enrollment failed - likely due to incorrect credentials
@@ -205,6 +226,92 @@ async function main() {
             res.send(e.details && e.details.length ? e.details : e.message);
         }
     })
+
+
+    app.post("/create-organization", async (req, res) => {
+        const { caImage, caVersion, storageClass, capacity, orgName, enrollId, enrollPw, hosts, istioPort } = req.body;
+    
+        const createCACommand = `kubectl hlf ca create --image=${caImage} --version=${caVersion} ` +
+            `--storage-class=${storageClass} --capacity=${capacity} --name=${orgName}-ca ` + 
+            `--enroll-id=${enrollId} --enroll-pw=${enrollPw} --hosts=${hosts} --istio-port=${istioPort}`;
+    
+        exec(createCACommand, (error, stdout, stderr) => {
+            if (error || stderr) {
+                console.error(`Warnings: ${error ? error.message : ''} ${stderr}`);
+                return res.status(500).json({ message: "An error occurred while creating the organization." });
+            }
+            console.log(`stdout: ${stdout}`);
+            res.status(200).json({ message: "Organization created successfully" });
+        });
+    });
+
+    app.get("/list-organizations", async (req, res) => {
+        const command = 'kubectl get deployments -n default -l app=hlf-ca -o json';
+        
+        executeShellCommand(command).then(stdout => {
+            try {
+                const output = JSON.parse(stdout as string);
+                const organizations = output.items.map(deployment => ({
+                    name: deployment.metadata.name,
+                    readyReplicas: deployment.status.readyReplicas || 0,
+                    totalReplicas: deployment.spec.replicas || 0,
+                }));
+    
+                res.json({ organizations });
+            } catch (error) {
+                log.error(`Parsing error: ${error}`);
+                res.status(500).send("Error parsing the organization data.");
+            }
+        }).catch(error => {
+            log.error(`Execution error: ${error.message}`);
+            res.status(500).send("Error listing organizations.");
+        });
+    });    
+
+    app.post("/register-user", async (req, res) => {
+        const { name, user, secret, userType, enrollId, enrollSecret, mspid } = req.body;
+    
+        if (!name || !user || !secret || !userType || !enrollId || !enrollSecret || !mspid) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
+    
+        const registerUserCommand = `kubectl hlf ca register --name=${name} --user=${user} ` + 
+            `--secret=${secret} --type=${userType} --enroll-id=${enrollId} ` + 
+            `--enroll-secret=${enrollSecret} --mspid=${mspid}`;
+    
+        try {
+            const stdout = await executeShellCommand(registerUserCommand);
+            console.log(`stdout: ${stdout}`);
+            res.status(200).json({ message: "User registered successfully" });
+        } catch (error) {
+            console.error(`Error registering user: ${error.message}`);
+            res.status(500).json({ message: "An error occurred while registering the user." });
+        }
+    });    
+
+    app.post("/create-peer", async (req, res) => {
+        const {statedb, peerImage, peerVersion, enrollId, mspid, enrollPw, capacity, name, caName, hosts, istioPort,
+        } = req.body;
+    
+        if (!statedb || !peerImage || !peerVersion || !enrollId || !mspid || !enrollPw || !capacity || !name || !caName || !hosts || !istioPort) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
+    
+        const createPeerCommand = `kubectl hlf peer create --statedb=${statedb} --image=${peerImage} ` +
+            `--version=${peerVersion} --storage-class=standard --enroll-id=${enrollId} --mspid=${mspid} ` +
+            `--enroll-pw=${enrollPw} --capacity=${capacity} --name=${name} --ca-name=${caName} ` +
+            `--hosts=${hosts} --istio-port=${istioPort}`;
+    
+        try {
+            const stdout = await executeShellCommand(createPeerCommand);
+            console.log(`stdout: ${stdout}`);
+            res.status(200).json({ message: "Peer created successfully" });
+        } catch (error) {
+            console.error(`Error creating peer: ${error.message}`);
+            res.status(500).json({ message: "An error occurred while creating the peer." });
+        }
+    });
+    
 
     app.post("/evaluate", async (req, res) => {
         try {
