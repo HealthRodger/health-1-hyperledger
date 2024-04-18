@@ -38,13 +38,20 @@ export default function AdminPage() {
     .then(response => {
       // Process the user data to extract roles
       const formattedUsers = response.data
-      .filter(user => !user.revoked) // Exclude users whose 'revoked' attribute is true
+      .filter(user => {
+        // Exclude users whose 'revoked' attribute is true or have specific ids
+        return !user.revoked && user.id !== "enroll" && user.id !== "peer";
+      }) // Properly excludes revoked users and those with ids 'enroll' or 'peer'
       .map(user => {
-          const roleAttribute = user.attributes.find(attr => attr.name === 'role');
-          return {
-              id: user.id,
-              role: roleAttribute ? roleAttribute.value : 'No role assigned', // Fallback in case 'role' is not found
-          };
+        let roleAttribute = user.attributes.find(attr => attr.name === 'role');
+        if (user.id === "admin") {
+          roleAttribute = { value: "admin" }; // Create an object that mimics the expected structure
+        }
+    
+        return {
+          id: user.id,
+          role: roleAttribute ? roleAttribute.value : 'No role assigned', // Fallback in case 'role' is not found
+        };
       });
       setUsers(formattedUsers);
     })

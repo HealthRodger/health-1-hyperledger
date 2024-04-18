@@ -161,8 +161,6 @@ async function main() {
                     revoked: !!revokedUsers[identity.id]
                 }));
                 res.json(userList);
-                let test = await identityService.getOne("u1", registrar);
-                console.log(test)
             }
             else {
                 log.error("Failed to retrieve users");
