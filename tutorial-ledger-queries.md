@@ -791,13 +791,13 @@ kubectl hlf chaincode commit --config=resources/network.yaml --user=admin --mspi
 ```
 
 ## Invoke a transaction on the channel
-
+<!-- 
 ```bash
 kubectl hlf chaincode invoke --config=resources/network.yaml \
     --user=admin --peer=org1-peer0.default \
     --chaincode=asset --channel=demo \
     --fcn=InitLedger
-```
+``` -->
 
 ```bash
 kubectl hlf chaincode invoke --config=resources/network.yaml \
