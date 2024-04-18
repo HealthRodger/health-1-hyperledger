@@ -9,20 +9,17 @@ import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import {
-  MainListItems,
-  SecondaryListItems,
-} from "./listItems";
+import { MainListItems, SecondaryListItems } from "./listItems";
 import HospitalPage from "./Hospital/HospitalPage";
 import AdminPage from "./Admin/AdminPage";
 import ResearcherPage from "./Researcher/ResearcherPage";
 import LoginPage from "./Login/LoginPage";
 import axios from "axios";
-import config from '../config'
+import config from "../config";
 
 const drawerWidth = 240;
 
@@ -44,7 +41,8 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-const Drawer = styled(MuiDrawer, { //Drawer component on the left
+const Drawer = styled(MuiDrawer, {
+  //Drawer component on the left
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   "& .MuiDrawer-paper": {
@@ -79,7 +77,7 @@ export default function Dashboard() {
   const [clickedButton, setClickedButton] = React.useState("LoginPage"); // State to manage which page is active
   const [role, setRole] = React.useState(null); // State to store the user's role
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [snackbarMessage, setSnackbarMessage] = React.useState('');
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
 
   React.useEffect(() => {
     // On component mount, fetch the user's role from the server
@@ -113,18 +111,20 @@ export default function Dashboard() {
       });
   }, []);
 
-  const toggleDrawer = () => { // Function to toggle the drawer open/close
+  const toggleDrawer = () => {
+    // Function to toggle the drawer open/close
     setOpen(!open);
   };
 
   const handleCloseSnackbar = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setSnackbarOpen(false);
   };
 
-  return (// Applying the theme to the component tree
+  return (
+    // Applying the theme to the component tree
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
@@ -201,11 +201,20 @@ export default function Dashboard() {
             <HospitalPage />
           )}
         </Box>
-        <Snackbar open={open} autoHideDuration={6000} onClose={handleCloseSnackbar}>{/* Notification component */}
-        <Alert onClose={handleCloseSnackbar} severity="error" sx={{ width: '100%' }}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+        <Snackbar
+          open={open}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+        >
+          {/* Notification component */}
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity="error"
+            sx={{ width: "100%" }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
       </Box>
     </ThemeProvider>
   );
