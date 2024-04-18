@@ -7,7 +7,9 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import { DateTimePicker } from "@mui/lab";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
 import { CheckCircle, ErrorOutline } from "@mui/icons-material";
 import axios from "axios";
 import { green, grey, red } from "@mui/material/colors";
@@ -92,14 +94,15 @@ export default function GenericTimeQuery({
             <Typography variant="h5" sx={{ m: 2 }}>
               {title}
             </Typography>
-            <div>
-                <DateTimePicker
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DateTimePicker
                 label="Select Date & Time"
                 value={selectedDate}
                 onChange={handleDateChange}
-                />
-            </div>
+              />
+            </LocalizationProvider>
             <Button
+              sx={{ mt: 2 }}
               variant="contained"
               color="primary"
               onClick={sendQueryToServer}
