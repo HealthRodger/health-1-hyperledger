@@ -13,7 +13,6 @@ import Badge from '@mui/material/Badge';
 import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import { MainListItems, SecondaryListItems, secondaryListItems } from './listItems';
 import HospitalPage from './Hospital/HospitalPage';
 import AdminPage from './AdminPage';
@@ -85,7 +84,7 @@ const defaultTheme = createTheme();
 
 export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
-  const [clickedButton, setClickedButton] = React.useState("HospitalPage")
+  const [clickedButton, setClickedButton] = React.useState("LoginPage")
   const [role, setRole] = React.useState(null);
 
   React.useEffect(() => {
@@ -152,11 +151,6 @@ export default function Dashboard() {
             >
               Dashboard
             </Typography>
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>

@@ -23,7 +23,7 @@ export default function LoginPage() {
     const handleSubmit = async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        const username = data.get('email'); // Adjust according to your backend expectation
+        const username = data.get('uname'); // Adjust according to your backend expectation
         const password = data.get('password');
         
         try {
@@ -77,10 +77,10 @@ export default function LoginPage() {
                   margin="normal"
                   required
                   fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
+                  id="uname"
+                  label="Username"
+                  name="uname"
+                  autoComplete="Username"
                   autoFocus
                 />
                 <TextField
