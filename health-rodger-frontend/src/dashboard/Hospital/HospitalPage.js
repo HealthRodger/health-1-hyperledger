@@ -10,8 +10,11 @@ import {
 } from "@mui/material";
 import FileUpload from "./FileUpload";
 import axios from "axios";
+import config from "../../config";
 
+// This is the page where hospital users can input and submit asset data.
 export default function HospitalPage() {
+  // State for holding asset form data.
   const [assetData, setAssetData] = useState({
     id: "",
     name: "",
@@ -25,6 +28,8 @@ export default function HospitalPage() {
     department: "",
     contactPerson: "",
   });
+
+  // State to inform the user of the current status of asset data submission.
   const [uploadStatus, setUploadStatus] = useState("Fill in the asset data");
 
   const handleFileSelectSuccess = (file) => {
@@ -54,6 +59,7 @@ export default function HospitalPage() {
     setUploadStatus("Error chosing the file!");
   };
 
+  // handleChange updates the assetData state with form input changes.
   const handleChange = (e) => {
     const { name, value } = e.target;
     setAssetData((prevState) => ({
@@ -62,17 +68,20 @@ export default function HospitalPage() {
     }));
   };
 
+  // handleSubmit is called when the asset data form is submitted.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setUploadStatus("Submitting asset...");
 
     try {
+      // Convert form data to the appropriate types.
       const convertedData = {
         ...assetData,
         available: assetData.available === "true",
         isWearable: assetData.isWearable === "true",
       };
 
+      // Prepare the arguments for the backend submission.
       const args = [
         convertedData.id,
         convertedData.name,
@@ -104,7 +113,7 @@ export default function HospitalPage() {
 
     // Make the HTTP post request with the "x-user" header
     const response = await axios.post(
-      "http://localhost:3003/submit",
+      `${config.apiUrl}/submit`,
       {
         fcn: "CreateAsset",
         args: data,
@@ -116,6 +125,7 @@ export default function HospitalPage() {
       }
     );
 
+    // Check the response status code and set the upload status message accordingly.
     if (response.status === 200) {
       setUploadStatus("Asset submitted successfully");
     } else {

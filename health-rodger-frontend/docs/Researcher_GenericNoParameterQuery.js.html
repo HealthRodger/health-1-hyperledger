@@ -1,4 +1,32 @@
-import React, { useState } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Researcher/GenericNoParameterQuery.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Researcher/GenericNoParameterQuery.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState } from "react";
 import { Container, Grid, Paper, Typography, Button } from "@mui/material";
 import { CheckCircle, ErrorOutline } from "@mui/icons-material";
 import axios from "axios";
@@ -16,7 +44,7 @@ import config from "../../config";
  * @param {Object} props - The component props.
  * @param {string} props.title - The title displayed above the query button.
  * @param {string} props.queryString - The actual query string that will be sent to the backend.
- * @param {Array<string>} props.headers - The column headers for the table that displays the results of the query.
+ * @param {Array&lt;string>} props.headers - The column headers for the table that displays the results of the query.
  * @returns {React.ReactElement} The `GenericNoParameterQuery` component.
  */
 function GenericNoParameterQuery({
@@ -64,9 +92,9 @@ function GenericNoParameterQuery({
   // Function to determine which status icon to show based on the current status
   const getStatusIcon = () => {
     if (uploadStatus.toLowerCase().includes("error")) {
-      return <ErrorOutline sx={{ fontSize: 40, color: red[500] }} />;
+      return &lt;ErrorOutline sx={{ fontSize: 40, color: red[500] }} />;
     } else if (uploadStatus.toLowerCase().includes("completed")) {
-      return <CheckCircle sx={{ fontSize: 40, color: green[500] }} />;
+      return &lt;CheckCircle sx={{ fontSize: 40, color: green[500] }} />;
     } else {
       return null; // If status is neither 'error' nor 'completed', return no icon
     }
@@ -86,11 +114,11 @@ function GenericNoParameterQuery({
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4, py: 4, background: "#eee" }}>
-      <Grid container spacing={3}>
+    &lt;Container maxWidth="lg" sx={{ mt: 4, mb: 4, py: 4, background: "#eee" }}>
+      &lt;Grid container spacing={3}>
         {/* Query initiation section */}
-        <Grid item xs={12} md={8} lg={9}>
-          <Paper
+        &lt;Grid item xs={12} md={8} lg={9}>
+          &lt;Paper
             sx={{
               p: 2,
               display: "flex",
@@ -100,21 +128,21 @@ function GenericNoParameterQuery({
               height: 240,
             }}
           >
-            <Typography variant="h5" sx={{ m: 2 }}>
+            &lt;Typography variant="h5" sx={{ m: 2 }}>
               {title} {/* Title for the query section */}
-            </Typography>
-            <Button
+            &lt;/Typography>
+            &lt;Button
               variant="contained"
               color="primary"
               onClick={sendQueryToServer} // Button to trigger the query
             >
               Send Query
-            </Button>
-          </Paper>
-        </Grid>
+            &lt;/Button>
+          &lt;/Paper>
+        &lt;/Grid>
         {/* Status display section */}
-        <Grid item xs={12} md={4} lg={3}>
-          <Paper
+        &lt;Grid item xs={12} md={4} lg={3}>
+          &lt;Paper
             sx={{
               p: 2,
               display: "flex",
@@ -126,7 +154,7 @@ function GenericNoParameterQuery({
             }}
           >
             {getStatusIcon()} {/* Display the status icon */}
-            <Typography
+            &lt;Typography
               component="p"
               variant="h4"
               sx={{
@@ -139,22 +167,45 @@ function GenericNoParameterQuery({
               }}
             >
               {uploadStatus} {/* Current status text */}
-            </Typography>
-          </Paper>
-        </Grid>
+            &lt;/Typography>
+          &lt;/Paper>
+        &lt;/Grid>
         {/* Resulting data table section */}
-        <Grid item xs={12}>
-          <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
+        &lt;Grid item xs={12}>
+          &lt;Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
             {/* Pass headers and entry data to the GenericTable component for display */}
-            <GenericTable
+            &lt;GenericTable
               headers={headers}
               entries={entries.map((entry) => entry.Record)}
             />
-          </Paper>
-        </Grid>
-      </Grid>
-    </Container>
+          &lt;/Paper>
+        &lt;/Grid>
+      &lt;/Grid>
+    &lt;/Container>
   );
 }
 
 export default GenericNoParameterQuery
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AdminPage">AdminPage</a></li><li><a href="global.html#Dashboard">Dashboard</a></li><li><a href="global.html#EntryTable">EntryTable</a></li><li><a href="global.html#FileUpload">FileUpload</a></li><li><a href="global.html#GenericNoParameterQuery">GenericNoParameterQuery</a></li><li><a href="global.html#GenericQuery">GenericQuery</a></li><li><a href="global.html#GenericSingleParameterQuery">GenericSingleParameterQuery</a></li><li><a href="global.html#GenericTable">GenericTable</a></li><li><a href="global.html#GenericTimeQuery">GenericTimeQuery</a></li><li><a href="global.html#LoginPage">LoginPage</a></li><li><a href="global.html#MainListItems">MainListItems</a></li><li><a href="global.html#ResearcherPage">ResearcherPage</a></li><li><a href="global.html#SecondaryListItems">SecondaryListItems</a></li><li><a href="global.html#Title">Title</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 19 2024 17:17:57 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
