@@ -304,7 +304,6 @@ async function main() {
             console.log(user)
             console.log(users)
             if (user && users[user]) {
-                console.log("a")
                 log.info(`Using user: ${user}`)
                 const connectOptions = await newConnectOptions(
                     grpcConn,
