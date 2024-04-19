@@ -1,4 +1,15 @@
-# Tutorial
+# Modified Tutorial
+Changed ``docker push ...`` to ``kind load docker-image ...`` to avoid pushing the image to a registry (which is pointless in our case). 
+Also added creator attributes when registering/enrolling organization 1
+
+If something goes wrong, there is a high probability that just removing the resources and running the commands again will fix the issue. You can remove the resources with the following command:
+
+```bash
+docker stop kind-control-plane
+docker remove kind-control-plane
+```
+
+Or by following the cleanup instructions at the end of the tutorial. This tutorial will add some files.
 
 Resources:
 
@@ -391,30 +402,31 @@ kubectl hlf ca enroll --name=ord-ca --namespace=default \
 ```
 
 ### Register and enrolling Org1MSP identity
+We give the creator attribute to the user, so it can create assets. Org1 now plays the role of hospital.
 
 ```bash
 # register
 kubectl hlf ca register --name=org1-ca --namespace=default --user=admin --secret=adminpw \
-    --type=admin --enroll-id enroll --enroll-secret=enrollpw --mspid=Org1MSP
+    --type=admin --enroll-id enroll --enroll-secret=enrollpw --mspid=Org1MSP --attributes="role=networkadmin"
 
 # enroll
 kubectl hlf ca enroll --name=org1-ca --namespace=default \
     --user=admin --secret=adminpw --mspid Org1MSP \
-    --ca-name ca  --output resources/org1msp.yaml
+    --ca-name ca  --output resources/org1msp.yaml --attributes="role"
 
 ```
 
 ### Register and enrolling Org2MSP identity
-
+We don't give the creator attribute to the user, so it can't create assets. Org2 now plays the role of the researcher.
 ```bash
 # register
 kubectl hlf ca register --name=org2-ca --namespace=default --user=admin --secret=adminpw \
-    --type=admin --enroll-id enroll --enroll-secret=enrollpw --mspid=Org2MSP
+    --type=admin --enroll-id enroll --enroll-secret=enrollpw --mspid Org2MSP --attributes="role=orgadmin"
 
 # enroll
 kubectl hlf ca enroll --name=org2-ca --namespace=default \
     --user=admin --secret=adminpw --mspid Org2MSP \
-    --ca-name ca  --output resources/org2msp.yaml
+    --ca-name ca  --output resources/org2msp.yaml --attributes="role"
 
 ```
 
@@ -623,18 +635,18 @@ To prepare the connection string, we have to:
 kubectl hlf inspect -c=demo --output resources/network.yaml -o Org1MSP -o Org2MSP -o OrdererMSP
 ```
 
-2. Register a user in the certification authority for signing
+2. Register a user in the certification authority for signing (already did this so you should get a warning that the user already exists)
 
 ```bash
 kubectl hlf ca register --name=org1-ca --user=admin --secret=adminpw --type=admin \
- --enroll-id enroll --enroll-secret=enrollpw --mspid Org1MSP
+ --enroll-id enroll --enroll-secret=enrollpw --mspid Org1MSP --attributes="role=networkadmin"
 ```
 
-3. Get the certificates using the user created above
+3. Get the certificates using the user created above (already did this so you should get a warning that the user already exists)
 
 ```bash
 kubectl hlf ca enroll --name=org1-ca --user=admin --secret=adminpw --mspid Org1MSP \
-        --ca-name ca  --output resources/peer-org1.yaml
+        --ca-name ca  --output resources/peer-org1.yaml --attributes="role"
 ```
 
 4. Attach the user to the connection string
@@ -643,18 +655,18 @@ kubectl hlf ca enroll --name=org1-ca --user=admin --secret=adminpw --mspid Org1M
 kubectl hlf utils adduser --userPath=resources/peer-org1.yaml --config=resources/network.yaml --username=admin --mspid=Org1MSP
 ```
 
-5. Register a user in the certification authority for signing
+5. Register a user in the certification authority for signing (already did this so you should get a warning that the user already exists)
 
 ```bash
 kubectl hlf ca register --name=org2-ca --user=admin --secret=adminpw --type=admin \
- --enroll-id enroll --enroll-secret=enrollpw --mspid Org2MSP
+        --enroll-id enroll --enroll-secret=enrollpw --mspid Org2MSP --attributes="role=orgadmin"
 ```
 
-6. Get the certificates using the user created above
+6. Get the certificates using the user created above (already did this so you should get a warning that the user already exists)
 
 ```bash
 kubectl hlf ca enroll --name=org2-ca --user=admin --secret=adminpw --mspid Org2MSP \
-        --ca-name ca  --output resources/peer-org2.yaml
+        --ca-name ca  --output resources/peer-org2.yaml --attributes="role"
 ```
 
 7. Attach the user to the connection string
@@ -717,14 +729,6 @@ export IMAGE="kfsoftware/asset-transfer-basic-ts:latest"
 ```
 
 ### Build the docker image
-
-If you are using Mac M1, you need to specify platform linux/amd64:
-```bash
-docker build -t $IMAGE --platform=linux/amd64 --file=./asset-transfer-basic/Dockerfile ./asset-transfer-basic
-```
-
-Otherwise, just run:
-
 ```bash
 docker build -t $IMAGE --file=./asset-transfer-basic/Dockerfile ./asset-transfer-basic
 ```
@@ -734,7 +738,7 @@ docker build -t $IMAGE --file=./asset-transfer-basic/Dockerfile ./asset-transfer
 Push the docker image to the container registry:
 
 ```bash
-docker push $IMAGE
+kind load docker-image $IMAGE
 ```
 
 ## Deploy chaincode container on cluster
@@ -787,12 +791,30 @@ kubectl hlf chaincode commit --config=resources/network.yaml --user=admin --mspi
 ```
 
 ## Invoke a transaction on the channel
-
+<!-- 
 ```bash
 kubectl hlf chaincode invoke --config=resources/network.yaml \
     --user=admin --peer=org1-peer0.default \
     --chaincode=asset --channel=demo \
     --fcn=InitLedger
+``` -->
+
+```bash
+kubectl hlf chaincode invoke --config=resources/network.yaml \
+    --user=admin --peer=org1-peer0.default \
+    --chaincode=asset --channel=demo \
+    --fcn=CreateAsset \
+    -a="assetid1" \
+    -a="assetname1" \
+    -a="Wearable" \
+    -a="0.0.0.0" \
+    -a="true" \
+    -a="0" \
+    -a="true" \
+    -a="-" \
+    -a="Meander" \
+    -a="Radiology" \
+    -a="Jaylan"
 ```
 
 ## Query assets in the channel
@@ -802,6 +824,13 @@ kubectl hlf chaincode query --config=resources/network.yaml \
     --user=admin --peer=org1-peer0.default \
     --chaincode=asset --channel=demo \
     --fcn=GetAllAssets
+```
+
+```bash
+kubectl hlf chaincode query --config=resources/network.yaml \
+    --user=admin --peer=org1-peer0.default \
+    --chaincode=asset --channel=demo \
+    --fcn=QueryAssets -a="{\"selector\":{\"ID\": \"assetid1\"}, \"fields\": [\"IpAddress\"]}"
 ```
 
 
