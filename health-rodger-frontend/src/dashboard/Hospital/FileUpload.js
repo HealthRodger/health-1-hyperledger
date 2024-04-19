@@ -8,8 +8,6 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import axios from 'axios';
 import { Typography } from '@mui/material';
 
-export default function FileUpload({ onFileSelectSuccess, onFileSelectError }) {
-
 /**
  * Provides a button that allows users to select a file to upload.
  *
@@ -60,10 +58,12 @@ const FileUpload = ({ onFileSelectSuccess, onFileSelectError }) => {
       <TextField
         margin="normal"
         fullWidth
-        variant="outlined"
-        value={fileName}
+        value={fileName == '' ? "Your filename.csv" : fileName}
         disabled
       />
+    <Typography variant="caption" color="text.secondary">
+                File must be in CSV format
+    </Typography>
       {/* Label element used as a wrapper for the Button to trigger the file input */}
       <label htmlFor="upload-file">
         {/* Button styled as a contained button that triggers the hidden file input */}
@@ -79,3 +79,5 @@ const FileUpload = ({ onFileSelectSuccess, onFileSelectError }) => {
     </FormControl>
   );
 };
+
+export default FileUpload;
