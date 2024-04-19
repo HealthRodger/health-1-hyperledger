@@ -26,10 +26,6 @@ kubectl get pods
 
 ## Development
 
-Back-end for the GUI is written in Node.js and Express.js, and can be found in ``/client``. 
-The front-end is written in React.js using Material UI and can be found in ``/health-rodger-frontend``.
-Chaincode is written in Typescript and can be found in ``/asset-transfer-basic``.
-
 Using the default network configuration, the following scripts are available as QoL tools:
 
 - `./deployCC.sh`: Deploys the current chaincode to the network

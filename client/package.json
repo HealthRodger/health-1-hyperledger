@@ -23,7 +23,6 @@
     "fabric-network": "^2.2.13",
     "fabric-sdk-node": "^1.1.0",
     "lodash": "^4.17.21",
-    "pg": "^8.11.5",
     "protobufjs": "^7.0.0",
     "tslog": "^3.3.4",
     "yaml": "^2.1.1"

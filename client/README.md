@@ -8,7 +8,7 @@ This API exposes via HTTP the operations that can be performed on the chaincode 
 npm install
 ```
 
-## Launch the server for an Organisation
+## Launch the server for Org1
 
 Launch the server for the Org1
 
@@ -16,11 +16,20 @@ Launch the server for the Org1
 npm run server:org1:dev
 ```
 
+## Launch the server for Org2
+
+Launch the server for the Org2
+
+```bash
+npm run server:org2:dev
+```
+
 ## Operations
 
-The API:
+There are two APIs:
 
 Org1: http://localhost:3003
+Org2: http://localhost:3004
 
 
 ### Get all assets Org1
@@ -28,11 +37,14 @@ Org1: http://localhost:3003
 ```bash
 http POST "http://localhost:3003/evaluate" fcn=GetAllAssets 
 ```
+### Get all assets Org2
+
+```bash
+http POST "http://localhost:3004/evaluate" fcn=GetAllAssets 
+```
 
 
 ### Create asset Org1
-
-This is a generic example of asset creation, it does not create a device asset that corresponds with our chaincode
 
 ```bash
 http POST "http://localhost:3003/submit" fcn=CreateAsset "args[]=AssetKey11" "args[]=Blue" "args[]=10" "args[]=4"
@@ -40,21 +52,35 @@ http POST "http://localhost:3003/submit" fcn=CreateAsset "args[]=AssetKey11" "ar
 http POST "http://localhost:3003/evaluate" fcn=ReadAsset "args[]=AssetKey11"
 ```
 
-## Revoked Users
+### Transfer asset from Org1 to Org2
+```bash
+http POST "http://localhost:3003/submit" fcn=TransferAsset "args[]=AssetKey11" "args[]=Org2MSP:x509::/OU=admin/CN=admin::/C=ES/L=Alicante/=Alicante/O=Kung Fu Software/OU=Tech/CN=ca"
+```
 
-To keep track of revoked users, their usernames are stored in the file revokedUsers.json
 
-These are used when getting all the users, to avoid having to check whether each individual user is still valid
+### Read asset to verify owner
 
-## Server.ts
+```bash
+http POST "http://localhost:3003/evaluate" fcn=ReadAsset "args[]=AssetKey11"
 
-The src/server.ts file contains the code for the server. Endpoints are included for the following:
+```
+### Org2 updates the asset
 
-- /signup to sign up a new user
-- /users to get a list of all users
-- /revoke to remove a user
-- /role_check to get the role, hospital or researcher, of a user
-- /login to log a user into the frontend
-- /ping to ping the blockchain
-- /evaluate to evaluate a transaction, for example query for a device
-- /submit to submit a transaction, for example upload a device
+```bash
+http POST "http://localhost:3004/submit" fcn=UpdateAsset "args[]=AssetKey11" "args[]=Red" "args[]=10" "args[]=4"
+http POST "http://localhost:3004/evaluate" fcn=ReadAsset "args[]=AssetKey11"
+```
+
+### Transfer asset back to Org1
+
+
+```bash
+http POST "http://localhost:3004/submit" fcn=TransferAsset "args[]=AssetKey11" "args[]=Org1MSP:x509::/OU=admin/CN=admin::/C=ES/L=Alicante/=Alicante/O=Kung Fu Software/OU=Tech/CN=ca"
+
+```
+### Read asset to verify owner again
+
+```bash
+http POST "http://localhost:3003/evaluate" fcn=ReadAsset "args[]=AssetKey11"
+
+```

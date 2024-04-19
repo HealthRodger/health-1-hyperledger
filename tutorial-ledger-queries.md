@@ -407,12 +407,12 @@ We give the creator attribute to the user, so it can create assets. Org1 now pla
 ```bash
 # register
 kubectl hlf ca register --name=org1-ca --namespace=default --user=admin --secret=adminpw \
-    --type=admin --enroll-id enroll --enroll-secret=enrollpw --mspid=Org1MSP --attributes="role=hospital"
+    --type=admin --enroll-id enroll --enroll-secret=enrollpw --mspid=Org1MSP --attributes="abac.creator=true"
 
 # enroll
 kubectl hlf ca enroll --name=org1-ca --namespace=default \
     --user=admin --secret=adminpw --mspid Org1MSP \
-    --ca-name ca  --output resources/org1msp.yaml --attributes="role"
+    --ca-name ca  --output resources/org1msp.yaml --attributes="abac.creator"
 
 ```
 
@@ -639,14 +639,14 @@ kubectl hlf inspect -c=demo --output resources/network.yaml -o Org1MSP -o Org2MS
 
 ```bash
 kubectl hlf ca register --name=org1-ca --user=admin --secret=adminpw --type=admin \
- --enroll-id enroll --enroll-secret=enrollpw --mspid Org1MSP --attributes="role=hospital"
+ --enroll-id enroll --enroll-secret=enrollpw --mspid Org1MSP --attributes="abac.creator=true"
 ```
 
 3. Get the certificates using the user created above (already did this so you should get a warning that the user already exists)
 
 ```bash
 kubectl hlf ca enroll --name=org1-ca --user=admin --secret=adminpw --mspid Org1MSP \
-        --ca-name ca  --output resources/peer-org1.yaml --attributes="role"
+        --ca-name ca  --output resources/peer-org1.yaml --attributes="abac.creator"
 ```
 
 4. Attach the user to the connection string
@@ -791,13 +791,13 @@ kubectl hlf chaincode commit --config=resources/network.yaml --user=admin --mspi
 ```
 
 ## Invoke a transaction on the channel
-<!-- 
+
 ```bash
 kubectl hlf chaincode invoke --config=resources/network.yaml \
     --user=admin --peer=org1-peer0.default \
     --chaincode=asset --channel=demo \
     --fcn=InitLedger
-``` -->
+```
 
 ```bash
 kubectl hlf chaincode invoke --config=resources/network.yaml \
