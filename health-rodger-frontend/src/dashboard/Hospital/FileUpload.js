@@ -24,7 +24,8 @@ export default function FileUpload() {
 
     const [uploadStatus, setUploadStatus] = useState('');
 
-    const handleUploadClick = async () => {
+    const handleUploadClick = async (e) => {
+        e.preventDefault();
         if (!file) {
         return;
         }
