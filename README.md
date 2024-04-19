@@ -16,7 +16,7 @@ This script will set up a HyperLedger Fabric network with:
 - Two peer organizations with a CA each
   - One peer per organization
 - One orderer organization with a CA
-  - One orderer in the orderer organization
+  - Three orderers in the orderer organization
 - A main channel
 
 Org1 will be considered the Network Admin Organization and is specifically there to manage the network. 
