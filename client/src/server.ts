@@ -510,6 +510,33 @@ async function main() {
         }
     });
 
+    app.post("/create-peer", async (req, res) => {
+        const { orgName } = req.body; // Only organization name is expected from the frontend
+        if (!orgName) {
+            return res.status(400).json({ message: "Organization name is required" });
+        }
+        const caName = `${orgName}`;
+        const mspid = `${orgName}MSP`;
+        const peerName = `${orgName}-peer0`;
+        const hosts = `peer0-${orgName}.localho.st`;
+        const registerUserCommand = `kubectl hlf ca register --name=${caName} --user=peer --secret=peerpw ` +
+            `--type=peer --enroll-id=enroll --enroll-secret=enrollpw --mspid=${mspid}`;
+        const createPeerCommand = `kubectl hlf peer create --statedb=couchdb --image=hyperledger/fabric-peer ` +
+            `--version=2.4.6 --storage-class=standard --enroll-id=peer --mspid=${mspid} ` +
+            `--enroll-pw=peerpw --capacity=5Gi --name=${peerName} --ca-name=${caName}.default ` +
+            `--hosts=${hosts} --istio-port=443`;
+        try {
+            await executeShellCommand(registerUserCommand);
+            console.log("User registration successful.");
+            await executeShellCommand(createPeerCommand);
+            console.log("Peer created successfully.");
+            res.status(200).json({ message: "Peer user registered and peer created successfully" });
+        } catch (error) {
+            console.error(`Error during peer creation or registration: ${error.message}`);
+            res.status(500).json({ message: `An error occurred: ${error.message}` });
+        }
+    });
+
     // Set up the server to be running on the provided port and address
     const server = app.listen(
         {
