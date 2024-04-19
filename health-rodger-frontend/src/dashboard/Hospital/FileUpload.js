@@ -5,8 +5,11 @@ import Input from '@mui/material/Input';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import axios from 'axios';
+import * as $ from 'jquery';
 
-const FileUpload = ({ onFileSelectSuccess, onFileSelectError }) => {
+export default function FileUpload() {
+
     const [fileName, setFileName] = useState('');
 
     const handleFileInput = (e) => {
@@ -23,10 +26,10 @@ const FileUpload = ({ onFileSelectSuccess, onFileSelectError }) => {
 
     const handleUploadClick = async () => {
         if (!file) {
-          return;
+        return;
         }
 
-         
+        
         // Retrieve the username from local storage
         const username = localStorage.getItem('username');
 
@@ -34,7 +37,7 @@ const FileUpload = ({ onFileSelectSuccess, onFileSelectError }) => {
         let success = []
         let fail = []
         let count = 0
-        for(asset of data) {
+        for(var asset of data) {
 
             // Skip first line of csv with the headers
             if (count == 0 ) { 
@@ -89,7 +92,7 @@ const FileUpload = ({ onFileSelectSuccess, onFileSelectError }) => {
         }
 
         // Set final uploadstatus
-        failureinfo = ""
+        let failureinfo = ""
         if( length(fail) > 0 ) {
             failureinfo = "\nFailures were on lines: "
             for( num of fail) {
@@ -100,8 +103,6 @@ const FileUpload = ({ onFileSelectSuccess, onFileSelectError }) => {
         setUploadStatus( str(success.length) + "/" + str(count - 1) + " assets successfully uploaded" + failureinfo)
 
     };
-
-
 
     return (
         <FormControl fullWidth>
@@ -142,5 +143,3 @@ const FileUpload = ({ onFileSelectSuccess, onFileSelectError }) => {
         </FormControl>
     );
 };
-
-export default FileUpload;
