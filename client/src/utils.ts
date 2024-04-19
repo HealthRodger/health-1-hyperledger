@@ -3,12 +3,13 @@ import { ConnectOptions, Identity, Signer, signers } from '@hyperledger/fabric-g
 import * as grpc from '@grpc/grpc-js';
 import * as crypto from 'crypto';
 
-
+// Create new gRPC connection with provided tls credentials
 export async function newGrpcConnection(peerEndpoint: string, tlsRootCert: Buffer): Promise<grpc.Client> {
     const tlsCredentials = grpc.credentials.createSsl(tlsRootCert);
     return new grpc.Client(peerEndpoint, tlsCredentials, {});
 }
 
+// Set options for the connection
 export async function newConnectOptions(
     client: grpc.Client,
     mspId: string,
@@ -35,11 +36,13 @@ export async function newConnectOptions(
     };
 }
 
+// Create new identity for the msp
 export async function newIdentity(mspId: string, credentials: Uint8Array): Promise<Identity> {
 
     return { mspId, credentials };
 }
 
+// Create new private key signer
 export async function newSigner(privateKeyPem: string): Promise<Signer> {
     const privateKey = crypto.createPrivateKey(privateKeyPem);
     return signers.newPrivateKeySigner(privateKey);

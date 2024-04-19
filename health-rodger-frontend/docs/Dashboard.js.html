@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Dashboard.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Dashboard.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import * as React from "react";
+import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import MuiDrawer from "@mui/material/Drawer";
+import Box from "@mui/material/Box";
+import MuiAppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import List from "@mui/material/List";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import MenuIcon from "@mui/icons-material/Menu";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import { MainListItems, SecondaryListItems } from "./listItems";
+import HospitalPage from "./Hospital/HospitalPage";
+import AdminPage from "./Admin/AdminPage";
+import ResearcherPage from "./Researcher/ResearcherPage";
+import LoginPage from "./Login/LoginPage";
+import axios from "axios";
+import config from "../config";
+
+const drawerWidth = 240;
+
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(["width", "margin"], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open &amp;&amp; {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
+const Drawer = styled(MuiDrawer, {
+  //Drawer component on the left
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  "&amp; .MuiDrawer-paper": {
+    position: "relative",
+    whiteSpace: "nowrap",
+    width: drawerWidth,
+    transition: theme.transitions.create("width", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    boxSizing: "border-box",
+    ...(!open &amp;&amp; {
+      overflowX: "hidden",
+      transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+      width: theme.spacing(7),
+      [theme.breakpoints.up("sm")]: {
+        width: theme.spacing(9),
+      },
+    }),
+  },
+}));
+
+// TODO remove, this demo shouldn't need to reset the theme.
+const defaultTheme = createTheme();
+
+/**
+ * Dashboard serves as the main root component for the web application, managing navigation,
+ * user roles, and the display of various pages such as AdminPage, ResearcherPage, HospitalPage,
+ * and LoginPage. This component includes a navigation drawer, a snackbar for notifications, and
+ * dynamic content rendering based on the active user's role and selected navigation item.
+ *
+ * @component
+ * @returns {React.ReactElement} - The rendered Dashboard component which includes the AppBar,
+ */
+function Dashboard() {
+  const [open, setOpen] = React.useState(true); // State to control if the drawer is open
+  const [clickedButton, setClickedButton] = React.useState("LoginPage"); // State to manage which page is active
+  const [role, setRole] = React.useState(null); // State to store the user's role
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+
+  React.useEffect(() => {
+    // On component mount, fetch the user's role from the server
+    // Get the username somehow, perhaps from local storage or context
+    const username = localStorage.getItem("username");
+
+    axios
+      .post(`${config.apiUrl}/role_check`, { username })
+      .then((response) => {
+        console.log(response.data);
+        if (response.data === "admin") {
+          // If role check passes, set the role state
+          setRole("Admin");
+          setClickedButton("AdminPage");
+        }
+        if (response.data === "hospital") {
+          // If role check passes, set the role state
+          setRole("Hospital");
+          setClickedButton("HospitalPage");
+        }
+        if (response.data === "researcher") {
+          // If role check passes, set the role state
+          setRole("Researcher");
+          setClickedButton("ResearcherPage");
+        }
+      })
+      .catch((error) => {
+        const errorMessage = error.response?.data || error.message;
+        setSnackbarMessage(`Error checking role: ${errorMessage}`);
+        setSnackbarOpen(true);
+      });
+  }, []);
+
+  const toggleDrawer = () => {
+    // Function to toggle the drawer open/close
+    setOpen(!open);
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+  const showSnackbar = (message) => {
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+
+  return (
+    // Applying the theme to the component tree
+    &lt;ThemeProvider theme={defaultTheme}>
+      &lt;Box sx={{ display: "flex" }}>
+        &lt;CssBaseline />
+        &lt;AppBar position="absolute" open={open}>
+          &lt;Toolbar
+            sx={{
+              pr: "24px", // keep right padding when drawer closed
+            }}
+          >
+            &lt;IconButton
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={toggleDrawer}
+              sx={{
+                marginRight: "36px",
+                ...(open &amp;&amp; { display: "none" }),
+              }}
+            >
+              &lt;MenuIcon />
+            &lt;/IconButton>
+            &lt;Typography
+              component="h1"
+              variant="h6"
+              color="inherit"
+              noWrap
+              sx={{ flexGrow: 1 }}
+            >
+              Dashboard
+            &lt;/Typography>
+          &lt;/Toolbar>
+        &lt;/AppBar>
+        &lt;Drawer variant="permanent" open={open}>
+          &lt;Toolbar
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              px: [1],
+            }}
+          >
+            &lt;IconButton onClick={toggleDrawer}>
+              &lt;ChevronLeftIcon />
+            &lt;/IconButton>
+          &lt;/Toolbar>
+          &lt;Divider />
+          &lt;List component="nav">
+            &lt;MainListItems setClickedButton={setClickedButton} role={role} />
+            &lt;Divider sx={{ my: 1 }} />
+            &lt;SecondaryListItems setClickedButton={setClickedButton} />
+          &lt;/List>
+        &lt;/Drawer>
+        &lt;Box
+          component="main"
+          sx={{
+            backgroundColor: (theme) =>
+              theme.palette.mode === "light"
+                ? theme.palette.grey[100]
+                : theme.palette.grey[900],
+            flexGrow: 1,
+            height: "100vh",
+            overflow: "auto",
+          }}
+        >
+          &lt;Toolbar />
+
+          {clickedButton == "AdminPage" ? (
+            &lt;AdminPage showSnackbar={showSnackbar} />
+          ) : clickedButton == "ResearcherPage" ? (
+            &lt;ResearcherPage />
+          ) : clickedButton == "LoginPage" ? (
+            &lt;LoginPage />
+          ) : (
+            &lt;HospitalPage />
+          )}
+        &lt;/Box>
+
+        &lt;Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+        >
+          {/* Notification component */}
+          &lt;Alert
+            onClose={handleCloseSnackbar}
+            severity="error"
+            sx={{ width: "100%" }}
+          >
+            {snackbarMessage}
+          &lt;/Alert>
+        &lt;/Snackbar>
+      &lt;/Box>
+    &lt;/ThemeProvider>
+  );
+}
+
+export default Dashboard;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AdminPage">AdminPage</a></li><li><a href="global.html#Dashboard">Dashboard</a></li><li><a href="global.html#EntryTable">EntryTable</a></li><li><a href="global.html#FileUpload">FileUpload</a></li><li><a href="global.html#GenericNoParameterQuery">GenericNoParameterQuery</a></li><li><a href="global.html#GenericQuery">GenericQuery</a></li><li><a href="global.html#GenericSingleParameterQuery">GenericSingleParameterQuery</a></li><li><a href="global.html#GenericTable">GenericTable</a></li><li><a href="global.html#GenericTimeQuery">GenericTimeQuery</a></li><li><a href="global.html#LoginPage">LoginPage</a></li><li><a href="global.html#MainListItems">MainListItems</a></li><li><a href="global.html#ResearcherPage">ResearcherPage</a></li><li><a href="global.html#SecondaryListItems">SecondaryListItems</a></li><li><a href="global.html#Title">Title</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 19 2024 17:17:57 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: EntryTable.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: EntryTable.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import * as React from "react";
+import Link from "@mui/material/Link";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import { Button } from "@mui/material";
+import Title from "./Title";
+
+// Generate Order Data
+function createData(
+  id,
+  mID,
+  name,
+  type,
+  ipAdr,
+  available,
+  lastUpdate,
+  isWearable,
+  ownerHospital,
+  ownerDepartment,
+  ownerContactPerson
+) {
+  return {
+    id,
+    mID,
+    name,
+    type,
+    ipAdr,
+    available,
+    lastUpdate,
+    isWearable,
+    ownerHospital,
+    ownerDepartment,
+    ownerContactPerson,
+  };
+}
+
+const rows = [createData(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2)];
+
+function preventDefault(event) {
+  event.preventDefault();
+}
+/**
+ * EntryTable is a React component that renders a data table for displaying detailed entries.
+ * It takes an array of entry objects as props and displays them in a table format. Each entry includes
+ * details such as ID, name, type, IP address, availability, last update, wearable status, and ownership information.
+ *
+ * @component
+ * @param {Object[]} entries - An array of objects containing the details of each entry to be displayed in the table.
+ * Each object must contain the following properties:
+ *   - {number} ID - Unique identifier for the entry.
+ *   - {string} Name - Name of the entry.
+ *   - {string} Type - Type classification of the entry.
+ *   - {string} IpAddress - IP address associated with the entry.
+ *   - {boolean} Available - Availability status of the entry.
+ *   - {number} LastUpdate - Timestamp of the last update, stored as seconds since the Unix epoch.
+ *   - {boolean} IsWearable - Indicates if the entry is wearable.
+ *   - {string} Owner.Hospital - Name of the hospital owning the entry.
+ *   - {string} Owner.Department - Department within the hospital that owns the entry.
+ *   - {string} Owner.ContactPerson - Contact person for the entry within the hospital.
+ * @returns {React.ReactElement} - The rendered table component wrapped in a React Fragment with overflow controls.
+ */
+function EntryTable({ entries }) {
+  return (
+    &lt;React.Fragment>
+      &lt;Title>Entries&lt;/Title>
+      &lt;div style={{ maxHeight: "400px", overflow: "auto" }}>
+        &lt;Table size="small">
+          &lt;TableHead>
+            &lt;TableRow>
+              &lt;TableCell>ID&lt;/TableCell>
+              &lt;TableCell>Name&lt;/TableCell>
+              &lt;TableCell>Type&lt;/TableCell>
+              &lt;TableCell>Ip Address&lt;/TableCell>
+              &lt;TableCell>Available&lt;/TableCell>
+              &lt;TableCell>Last Update&lt;/TableCell>
+              &lt;TableCell>Is Wearable&lt;/TableCell>
+              &lt;TableCell>Owner_Hospital&lt;/TableCell>
+              &lt;TableCell>Owner_Department&lt;/TableCell>
+              &lt;TableCell>Owner_Contact_Person&lt;/TableCell>
+            &lt;/TableRow>
+          &lt;/TableHead>
+          &lt;TableBody>
+            {entries.map((entry) => (
+              &lt;TableRow key={entry.ID}>
+                &lt;TableCell>{entry.ID}&lt;/TableCell>
+                &lt;TableCell>{entry.Name}&lt;/TableCell>
+                &lt;TableCell>{entry.Type}&lt;/TableCell>
+                &lt;TableCell>{entry.IpAddress}&lt;/TableCell>
+                &lt;TableCell>{entry.Available ? "Yes" : "No"}&lt;/TableCell>
+                &lt;TableCell>
+                  {new Date(entry.LastUpdate * 1000).toLocaleString()}
+                &lt;/TableCell>
+                &lt;TableCell>{entry.IsWearable ? "Yes" : "No"}&lt;/TableCell>
+                &lt;TableCell>{entry.Owner.Hospital}&lt;/TableCell>
+                &lt;TableCell>{entry.Owner.Department}&lt;/TableCell>
+                &lt;TableCell>{entry.Owner.ContactPerson}&lt;/TableCell>
+              &lt;/TableRow>
+            ))}
+          &lt;/TableBody>
+        &lt;/Table>
+      &lt;/div>
+    &lt;/React.Fragment>
+  );
+}
+
+export default EntryTable;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AdminPage">AdminPage</a></li><li><a href="global.html#Dashboard">Dashboard</a></li><li><a href="global.html#EntryTable">EntryTable</a></li><li><a href="global.html#FileUpload">FileUpload</a></li><li><a href="global.html#GenericNoParameterQuery">GenericNoParameterQuery</a></li><li><a href="global.html#GenericQuery">GenericQuery</a></li><li><a href="global.html#GenericSingleParameterQuery">GenericSingleParameterQuery</a></li><li><a href="global.html#GenericTable">GenericTable</a></li><li><a href="global.html#GenericTimeQuery">GenericTimeQuery</a></li><li><a href="global.html#LoginPage">LoginPage</a></li><li><a href="global.html#MainListItems">MainListItems</a></li><li><a href="global.html#ResearcherPage">ResearcherPage</a></li><li><a href="global.html#SecondaryListItems">SecondaryListItems</a></li><li><a href="global.html#Title">Title</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 19 2024 17:17:57 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

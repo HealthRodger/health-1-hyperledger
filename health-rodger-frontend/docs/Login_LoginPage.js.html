@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Login/LoginPage.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Login/LoginPage.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState } from "react";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import CssBaseline from "@mui/material/CssBaseline";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import axios from "axios";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import config from "../../config";
+
+const defaultTheme = createTheme();
+
+/**
+ * LoginPage is a React component that provides a user interface for logging into the application. Any user using the system has to be authenticated.
+ * 
+ * This component displays a form for users to input their username and password. Upon submission,
+ * it sends a POST request to the server with these credentials. If authentication is successful,
+ * the username is stored in local storage, a success message is shown, and the page is reloaded.
+ * If authentication fails, an error message is displayed using a Snackbar.
+ *
+ * @component
+ * @returns {React.ReactElement} The `LoginPage` component.
+ */
+function LoginPage() {
+  const [open, setOpen] = useState(false); // State for Snackbar visibility
+  const [notification, setNotification] = useState(""); // State for notification message
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const username = data.get("uname"); // Adjust according to your backend expectation
+    const password = data.get("password");
+
+    try {
+      const response = await axios.post(`${config.apiUrl}/login`, {
+        username,
+        password,
+      });
+
+      // Assuming your server sends back a positive response for successful login
+      console.log(response.data);
+      localStorage.setItem("username", username); // Save username in local storage
+      setNotification("Login successful"); // Set notification message
+      setOpen(true); // Show notification
+
+      window.location.reload(); // This will reload the entire page
+    } catch (error) {
+      console.error("Failed to submit:", error);
+      setNotification("Login failed: Incorrect username or password"); // Set notification message
+      setOpen(true); // Show notification
+    }
+  };
+
+  // Function to close the Snackbar
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  };
+
+  return (
+    &lt;ThemeProvider theme={defaultTheme}>
+      &lt;Container component="main" maxWidth="xs">
+        &lt;CssBaseline />
+        &lt;Box
+          sx={{
+            marginTop: 8,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          &lt;Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+            &lt;LockOutlinedIcon />
+          &lt;/Avatar>
+          &lt;Typography component="h1" variant="h5">
+            Sign in
+          &lt;/Typography>
+          &lt;Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1 }}
+          >
+            &lt;TextField
+              margin="normal"
+              required
+              fullWidth
+              id="uname"
+              label="Username"
+              name="uname"
+              autoComplete="Username"
+              autoFocus
+            />
+            &lt;TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+            />
+            &lt;Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Sign In
+            &lt;/Button>
+          &lt;/Box>
+        &lt;/Box>
+
+        {/* Snackbar for notifications */}
+        &lt;Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          &lt;Alert
+            onClose={handleClose}
+            severity={notification.includes("failed") ? "error" : "success"}
+            sx={{ width: "100%" }}
+          >
+            {notification}
+          &lt;/Alert>
+        &lt;/Snackbar>
+      &lt;/Container>
+    &lt;/ThemeProvider>
+  );
+}
+
+export default LoginPage;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AdminPage">AdminPage</a></li><li><a href="global.html#Dashboard">Dashboard</a></li><li><a href="global.html#EntryTable">EntryTable</a></li><li><a href="global.html#FileUpload">FileUpload</a></li><li><a href="global.html#GenericNoParameterQuery">GenericNoParameterQuery</a></li><li><a href="global.html#GenericQuery">GenericQuery</a></li><li><a href="global.html#GenericSingleParameterQuery">GenericSingleParameterQuery</a></li><li><a href="global.html#GenericTable">GenericTable</a></li><li><a href="global.html#GenericTimeQuery">GenericTimeQuery</a></li><li><a href="global.html#LoginPage">LoginPage</a></li><li><a href="global.html#MainListItems">MainListItems</a></li><li><a href="global.html#ResearcherPage">ResearcherPage</a></li><li><a href="global.html#SecondaryListItems">SecondaryListItems</a></li><li><a href="global.html#Title">Title</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 19 2024 17:17:57 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
