@@ -17,7 +17,7 @@ const { exec } = require('child_process');
 
 function executeShellCommand(cmd) {
     return new Promise((resolve, reject) => {
-        exec(cmd, { shell: '/bin/bash' }, (error, stdout, stderr) => { 
+        exec(cmd, { shell: '/bin/bash' }, (error, stdout, stderr) => {
             if (error) {
                 console.error(`exec error: ${error}`);
                 reject(error);
@@ -34,6 +34,23 @@ function executeShellCommand(cmd) {
     });
 }
 
+async function createPeer(peerDetails) {
+    const { statedb, peerImage, peerVersion, enrollId, mspid, enrollPw, capacity, name, caName, hosts, istioPort } = peerDetails;
+
+    const createPeerCommand = `kubectl hlf peer create --statedb=${statedb} --image=${peerImage} ` +
+        `--version=${peerVersion} --storage-class=standard --enroll-id=${enrollId} --mspid=${mspid} ` +
+        `--enroll-pw=${enrollPw} --capacity=${capacity} --name=${name} --ca-name=${caName} ` +
+        `--hosts=${hosts} --istio-port=${istioPort}`;
+
+    try {
+        const stdout = await executeShellCommand(createPeerCommand);
+        console.log(`Peer created successfully: ${stdout}`);
+        return { success: true, message: "Peer created successfully" };
+    } catch (error) {
+        console.error(`Error creating peer: ${error.message}`);
+        throw new Error("An error occurred while creating the peer.");
+    }
+}
 
 
 async function main() {
@@ -227,27 +244,71 @@ async function main() {
         }
     })
 
-
     app.post("/create-organization", async (req, res) => {
         const { caImage, caVersion, storageClass, capacity, orgName, enrollId, enrollPw, hosts, istioPort } = req.body;
-    
+
         const createCACommand = `kubectl hlf ca create --image=${caImage} --version=${caVersion} ` +
-            `--storage-class=${storageClass} --capacity=${capacity} --name=${orgName}-ca ` + 
+            `--storage-class=${storageClass} --capacity=${capacity} --name=${orgName}-ca ` +
             `--enroll-id=${enrollId} --enroll-pw=${enrollPw} --hosts=${hosts} --istio-port=${istioPort}`;
-    
+
         exec(createCACommand, (error, stdout, stderr) => {
             if (error || stderr) {
-                console.error(`Warnings: ${error ? error.message : ''} ${stderr}`);
-                return res.status(500).json({ message: "An error occurred while creating the organization." });
+                console.error(`Error or warning during CA creation: ${error ? error.message : ''} ${stderr}`);
+                return res.status(500).json({ message: "Organization created with WARNINGS (ignore)" });
             }
-            console.log(`stdout: ${stdout}`);
-            res.status(200).json({ message: "Organization created successfully" });
+
+            console.log(`Organization CA created successfully: ${stdout}`);
+
+            const registerCommand = `kubectl hlf ca register --name=${orgName}-ca --namespace=default --user=admin --secret=adminpw ` +
+                `--type=admin --enroll-id=${enrollId} --enroll-secret=${enrollPw} --mspid=${orgName}MSP --attributes="abac.creator=true"`;
+
+            exec(registerCommand, (regError, regStdout, regStderr) => {
+                if (regError || regStderr) {
+                    console.error(`Error during admin registration: ${regError ? regError.message : ''} ${regStderr}`);
+                    return res.status(500).json({ message: "An error occurred during admin registration." });
+                }
+
+                console.log(`Admin registered successfully: ${regStdout}`);
+
+                const enrollCommand = `kubectl hlf ca enroll --name=${orgName}-ca --namespace=default ` +
+                    `--user=admin --secret=adminpw --mspid ${orgName}MSP ` +
+                    `--ca-name ca --output resources/${orgName}msp.yaml --attributes="abac.creator"`;
+
+                exec(enrollCommand, (enrollError, enrollStdout, enrollStderr) => {
+                    if (enrollError || enrollStderr) {
+                        console.error(`Error during admin enrollment: ${enrollError ? enrollError.message : ''} ${enrollStderr}`);
+                        return res.status(500).json({ message: "An error occurred during admin enrollment." });
+                    }
+
+                    console.log(`Admin enrolled successfully: ${enrollStdout}`);
+                    res.status(200).json({ message: "Organization CA, admin registered, and admin enrolled successfully." });
+                });
+            });
         });
+    });
+
+    app.post("/disable-organization", async (req, res) => {
+        const { orgName } = req.body;
+
+        if (!orgName) {
+            return res.status(400).json({ message: "Organization name is required." });
+        }
+
+        const deleteCACommand = `kubectl hlf ca delete --name=${orgName}`;
+
+        try {
+            await executeShellCommand(deleteCACommand);
+            console.log(`${orgName}-ca deleted successfully.`);
+            res.status(200).json({ message: "Organization CA deleted successfully." });
+        } catch (error) {
+            console.error(`Error deleting organization CA: ${error.message}`);
+            res.status(500).json({ message: "An error occurred while deleting the organization CA." });
+        }
     });
 
     app.get("/list-organizations", async (req, res) => {
         const command = 'kubectl get deployments -n default -l app=hlf-ca -o json';
-        
+
         executeShellCommand(command).then(stdout => {
             try {
                 const output = JSON.parse(stdout as string);
@@ -256,7 +317,7 @@ async function main() {
                     readyReplicas: deployment.status.readyReplicas || 0,
                     totalReplicas: deployment.spec.replicas || 0,
                 }));
-    
+
                 res.json({ organizations });
             } catch (error) {
                 log.error(`Parsing error: ${error}`);
@@ -266,52 +327,7 @@ async function main() {
             log.error(`Execution error: ${error.message}`);
             res.status(500).send("Error listing organizations.");
         });
-    });    
-
-    app.post("/register-user", async (req, res) => {
-        const { name, user, secret, userType, enrollId, enrollSecret, mspid } = req.body;
-    
-        if (!name || !user || !secret || !userType || !enrollId || !enrollSecret || !mspid) {
-            return res.status(400).json({ message: "Missing required fields" });
-        }
-    
-        const registerUserCommand = `kubectl hlf ca register --name=${name} --user=${user} ` + 
-            `--secret=${secret} --type=${userType} --enroll-id=${enrollId} ` + 
-            `--enroll-secret=${enrollSecret} --mspid=${mspid}`;
-    
-        try {
-            const stdout = await executeShellCommand(registerUserCommand);
-            console.log(`stdout: ${stdout}`);
-            res.status(200).json({ message: "User registered successfully" });
-        } catch (error) {
-            console.error(`Error registering user: ${error.message}`);
-            res.status(500).json({ message: "An error occurred while registering the user." });
-        }
-    });    
-
-    app.post("/create-peer", async (req, res) => {
-        const {statedb, peerImage, peerVersion, enrollId, mspid, enrollPw, capacity, name, caName, hosts, istioPort,
-        } = req.body;
-    
-        if (!statedb || !peerImage || !peerVersion || !enrollId || !mspid || !enrollPw || !capacity || !name || !caName || !hosts || !istioPort) {
-            return res.status(400).json({ message: "Missing required fields" });
-        }
-    
-        const createPeerCommand = `kubectl hlf peer create --statedb=${statedb} --image=${peerImage} ` +
-            `--version=${peerVersion} --storage-class=standard --enroll-id=${enrollId} --mspid=${mspid} ` +
-            `--enroll-pw=${enrollPw} --capacity=${capacity} --name=${name} --ca-name=${caName} ` +
-            `--hosts=${hosts} --istio-port=${istioPort}`;
-    
-        try {
-            const stdout = await executeShellCommand(createPeerCommand);
-            console.log(`stdout: ${stdout}`);
-            res.status(200).json({ message: "Peer created successfully" });
-        } catch (error) {
-            console.error(`Error creating peer: ${error.message}`);
-            res.status(500).json({ message: "An error occurred while creating the peer." });
-        }
     });
-    
 
     app.post("/evaluate", async (req, res) => {
         try {
