@@ -23,7 +23,7 @@ export default function LoginPage() {
     const handleSubmit = async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        const username = data.get('email'); // Adjust according to your backend expectation
+        const username = data.get('uname'); // Adjust according to your backend expectation
         const password = data.get('password');
         
         try {
@@ -37,6 +37,8 @@ export default function LoginPage() {
           localStorage.setItem('username', username); // Save username in local storage
           setNotification('Login successful'); // Set notification message
           setOpen(true); // Show notification
+
+          window.location.reload(); // This will reload the entire page
         } catch (error) {
           console.error('Failed to submit:', error);
           setNotification('Login failed: Incorrect username or password'); // Set notification message
@@ -75,10 +77,10 @@ export default function LoginPage() {
                   margin="normal"
                   required
                   fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
+                  id="uname"
+                  label="Username"
+                  name="uname"
+                  autoComplete="Username"
                   autoFocus
                 />
                 <TextField

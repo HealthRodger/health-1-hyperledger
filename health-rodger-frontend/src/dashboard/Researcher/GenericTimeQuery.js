@@ -4,21 +4,36 @@ import {
   Grid,
   Paper,
   Typography,
+  TextField,
   Button,
 } from "@mui/material";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
 import { CheckCircle, ErrorOutline } from "@mui/icons-material";
 import axios from "axios";
 import { green, grey, red } from "@mui/material/colors";
 import GenericTable from "../GenericTable";
 
-export default function GenericNoParameterQuery({ title, queryString, headers }) {
-  const [uploadStatus, setUploadStatus] = useState("Query status will be displayed here.");
+export default function GenericTimeQuery({
+  title,
+  argsToQueryString,
+  headers,
+}) {
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [uploadStatus, setUploadStatus] = useState(
+    "Query status will be displayed here."
+  );
   const [entries, setEntries] = useState([]);
+
+  const handleDateChange = (newDate) => {
+    setSelectedDate(newDate);
+  };
 
   const sendQueryToServer = async () => {
     const functionName = "QueryAssets";
-    const functionArgs = [queryString];
-    console.log(functionArgs);
+    const unixTime = Math.floor(selectedDate.getTime() / 1000);
+    const functionArgs = [argsToQueryString(unixTime)];
 
     setUploadStatus("Querying all assets...");
 
@@ -77,10 +92,18 @@ export default function GenericNoParameterQuery({ title, queryString, headers })
               height: 240,
             }}
           >
-            <Typography variant="h5" sx={{m:2}} >
+            <Typography variant="h5" sx={{ m: 2 }}>
               {title}
             </Typography>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DateTimePicker
+                label="Select Date & Time"
+                value={selectedDate}
+                onChange={handleDateChange}
+              />
+            </LocalizationProvider>
             <Button
+              sx={{ mt: 2 }}
               variant="contained"
               color="primary"
               onClick={sendQueryToServer}
@@ -119,7 +142,10 @@ export default function GenericNoParameterQuery({ title, queryString, headers })
         </Grid>
         <Grid item xs={12}>
           <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-            <GenericTable headers={headers} entries={entries.map(entry => entry.Record)} />
+            <GenericTable
+              headers={headers}
+              entries={entries.map((entry) => entry.Record)}
+            />
           </Paper>
         </Grid>
       </Grid>

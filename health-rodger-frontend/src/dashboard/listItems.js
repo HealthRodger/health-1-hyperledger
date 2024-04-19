@@ -10,27 +10,27 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import LayersIcon from '@mui/icons-material/Layers';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 
-export const MainListItems = ({ setClickedButton }) => {
+export const MainListItems = ({ setClickedButton, role }) => {
   return (
     <React.Fragment>
-      <ListItemButton onClick={() => setClickedButton("HospitalPage")}>
+      {role == "Hospital" ? <ListItemButton onClick={() => setClickedButton("HospitalPage")}>
         <ListItemIcon>
           <DashboardIcon />
         </ListItemIcon>
         <ListItemText primary="Hospital" />
-      </ListItemButton>
-      <ListItemButton onClick={() => setClickedButton("ResearcherPage")}>
+      </ListItemButton> : <></>}
+      {role == "Researcher" ? <ListItemButton onClick={() => setClickedButton("ResearcherPage")}>
         <ListItemIcon>
           <DashboardIcon />
         </ListItemIcon>
         <ListItemText primary="Researcher" />
-      </ListItemButton>
-      <ListItemButton onClick={() => setClickedButton("AdminPage")}>
+      </ListItemButton> : <></>}
+      {role == "Admin" ? <ListItemButton onClick={() => setClickedButton("AdminPage")}>
         <ListItemIcon>
           <DashboardIcon />
         </ListItemIcon>
         <ListItemText primary="Admin" />
-      </ListItemButton>
+      </ListItemButton> : <></>}
     </React.Fragment>
   );
 };

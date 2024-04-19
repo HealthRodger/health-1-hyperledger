@@ -1,51 +1,54 @@
 import React from "react";
 import GenericQuery from "./GenericQuery";
 import GenericSingleParameterQuery from "./GenericSingleParameterQuery";
-import GenericNoParameterQuery from "./GenericNoParameterQuery";
+// import GenericNoParameterQuery from "./GenericNoParameterQuery";
+import GenericTimeQuery from "./GenericTimeQuery";
 
 export default function ResearcherPage() {
   return (
     <>
       <GenericQuery />
-      <GenericSingleParameterQuery
-        title="List all devices not updated since given timestamp"
+      <GenericTimeQuery
+        title="1. List all devices not updated since given timestamp"
         headers={["ID", "Name", "LastUpdate"]}
-        parameterName={"Unix Timestamp"}
-        parameterType={"number"}
         argsToQueryString={(timestamp) => {
           return `{"selector": {"LastUpdate": {"$lt": ${timestamp}}}, "fields": ["ID", "Name", "LastUpdate"]}`;
         }}
       />
-      <GenericSingleParameterQuery
-        title="List all devices updated since given timestamp"
+      <GenericTimeQuery
+        title="2. List all devices updated since given timestamp"
         headers={["ID", "Name", "LastUpdate"]}
-        parameterName={"Unix Timestamp"}
-        parameterType={"number"}
         argsToQueryString={(timestamp) => {
           return `{"selector": {"LastUpdate": {"$gt": ${timestamp}}}, "fields": ["ID", "Name", "LastUpdate"]}`;
         }}
       />
-      <GenericSingleParameterQuery
-        title="List all available devices not updated since given timestamp"
+      <GenericTimeQuery
+        title="3. List all available devices not updated since given timestamp"
         headers={["ID", "Name", "LastUpdate"]}
-        parameterName={"Unix Timestamp"}
-        parameterType={"number"}
         argsToQueryString={(timestamp) => {
           return `{"selector": {"LastUpdate": {"$lt": ${timestamp}}, "Available": true}, "fields": ["ID", "Name", "LastUpdate"]}`;
         }}
       />
-      <GenericSingleParameterQuery
-        title="List all non-available devices not updated since given timestamp"
+      <GenericTimeQuery
+        title="4. List all non-available devices not updated since given timestamp"
         headers={["ID", "Name", "LastUpdate"]}
-        parameterName={"Unix Timestamp"}
-        parameterType={"number"}
         argsToQueryString={(timestamp) => {
           return `{"selector": {"LastUpdate": {"$lt": ${timestamp}}, "Available": false}, "fields": ["ID", "Name", "LastUpdate"]}`;
         }}
       />
       <GenericSingleParameterQuery
         title={
-          "5a. List all devices from a given department (over all hospitals)"
+          "5. List all devices with a given name (over all hospitals and departments)"
+        }
+        headers={["ID", "Name", "Available", "LastUpdate", "Owner"]}
+        parameterName="Device Name"
+        argsToQueryString={(deviceName) => {
+          return `{"selector": {"Name": "${deviceName}"}, "fields": ["ID", "Name", "Available", "LastUpdate", "Owner.Hospital", "Owner.ContactPerson"]}`;
+        }}
+      />
+      <GenericSingleParameterQuery
+        title={
+          "6. List all devices from a given department (over all hospitals)"
         }
         headers={["ID", "Name", "Available", "LastUpdate", "Owner"]}
         parameterName="Department name"
@@ -55,7 +58,7 @@ export default function ResearcherPage() {
       />
       <GenericSingleParameterQuery
         title={
-          "5b. List all available devices from a given department (over all hospitals)"
+          "7. List all available devices from a given department (over all hospitals)"
         }
         headers={["ID", "Name", "LastUpdate", "Owner"]}
         parameterName="Department name"
@@ -65,7 +68,7 @@ export default function ResearcherPage() {
       />
       <GenericSingleParameterQuery
         title={
-          "5c. List all non-available devices from a given department (over all hospitals)"
+          "8. List all non-available devices from a given department (over all hospitals)"
         }
         headers={["ID", "Name", "LastUpdate", "Owner"]}
         parameterName="Department name"
@@ -74,7 +77,7 @@ export default function ResearcherPage() {
         }}
       />
       <GenericSingleParameterQuery
-        title={"6. List all devices of a given type"}
+        title={"9. List all devices of a given type"}
         headers={["ID", "Name", "Available", "LastUpdate"]}
         parameterName="Type"
         argsToQueryString={(type) => {
