@@ -303,6 +303,13 @@ export class HealthAssetTransferContract extends Contract {
     let resultsIterator = await ctx.stub.getQueryResult(queryString);
     let results = await this.GetAllResults(resultsIterator, false);
 
+    // emit event for read
+    const eventPayload = stringify({
+      requestedBy: ctx.clientIdentity.getID(),
+      action: "Read",
+    });
+    ctx.stub.setEvent("QueryAssets", Buffer.from(eventPayload));
+
     return stringify(results);
   }
 
