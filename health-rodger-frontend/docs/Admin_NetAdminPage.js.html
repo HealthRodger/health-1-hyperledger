@@ -1,4 +1,32 @@
-import React, { useState, useEffect } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Admin/NetAdminPage.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Admin/NetAdminPage.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState, useEffect } from "react";
 import {
   Container,
   Grid,
@@ -128,12 +156,12 @@ function NetAdminPage() {
   const renderOrgDetails = () => {
     if (showCreateNewOrg) {
       return (
-        <Paper sx={{ p: 3, mt: 2 }}>
-          <Typography variant="h6" gutterBottom>
+        &lt;Paper sx={{ p: 3, mt: 2 }}>
+          &lt;Typography variant="h6" gutterBottom>
             Create New Organization
-          </Typography>
-          <form onSubmit={handleSubmit}>
-            <TextField
+          &lt;/Typography>
+          &lt;form onSubmit={handleSubmit}>
+            &lt;TextField
               required
               id="orgName"
               name="orgName"
@@ -144,7 +172,7 @@ function NetAdminPage() {
               onChange={handleChange}
               margin="normal"
             />
-            <TextField
+            &lt;TextField
               required
               id="enrollId"
               name="enrollId"
@@ -155,7 +183,7 @@ function NetAdminPage() {
               onChange={handleChange}
               margin="normal"
             />
-            <TextField
+            &lt;TextField
               required
               id="enrollPw"
               name="enrollPw"
@@ -166,7 +194,7 @@ function NetAdminPage() {
               onChange={handleChange}
               margin="normal"
             />
-            <TextField
+            &lt;TextField
               required
               id="hosts"
               name="hosts"
@@ -177,17 +205,17 @@ function NetAdminPage() {
               onChange={handleChange}
               margin="normal"
             />
-            <Button type="submit" variant="contained" sx={{ mt: 2 }}>
+            &lt;Button type="submit" variant="contained" sx={{ mt: 2 }}>
               Create Organization
-            </Button>
-          </form>
-        </Paper>
+            &lt;/Button>
+          &lt;/form>
+        &lt;/Paper>
       );
     } else if (selectedOrg) {
       return (
-        <Paper sx={{ p: 3, mt: 2 }}>
-          <Typography variant="h6">{selectedOrg.name}</Typography>
-          <div
+        &lt;Paper sx={{ p: 3, mt: 2 }}>
+          &lt;Typography variant="h6">{selectedOrg.name}&lt;/Typography>
+          &lt;div
             style={{
               display: "flex",
               justifyContent: "start",
@@ -195,19 +223,19 @@ function NetAdminPage() {
               marginTop: "20px",
             }}
           >
-            <Button
+            &lt;Button
               variant="contained"
               color="primary"
               onClick={handleDeployPeer}
             >
               Deploy Peer
-            </Button>
-            <Button
+            &lt;/Button>
+            &lt;Button
               variant="contained"
               sx={{
                 backgroundColor: "#d32f2f",
                 color: "white",
-                "&:hover": {
+                "&amp;:hover": {
                   backgroundColor: "#9a0007",
                 },
                 mt: 2,
@@ -215,70 +243,93 @@ function NetAdminPage() {
               onClick={() => handleRemoveOrg(selectedOrg.name)}
             >
               Remove Organization
-            </Button>
-          </div>
-        </Paper>
+            &lt;/Button>
+          &lt;/div>
+        &lt;/Paper>
       );
     } else {
       return (
-        <Typography variant="h6" sx={{ mt: 2 }}>
+        &lt;Typography variant="h6" sx={{ mt: 2 }}>
           Select an organization to manage
-        </Typography>
+        &lt;/Typography>
       );
     }
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4, paddingLeft: "0 !important" }}>
-      <Snackbar
+    &lt;Container maxWidth="lg" sx={{ mt: 4, mb: 4, paddingLeft: "0 !important" }}>
+      &lt;Snackbar
         open={!!error}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
       >
-        <Alert
+        &lt;Alert
           onClose={handleCloseSnackbar}
           severity="error"
           sx={{ width: "100%" }}
         >
           {error}
-        </Alert>
-      </Snackbar>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={5}>
-          <Paper sx={{ p: 2, backgroundColor: "#f0f0f0" }}>
-            <Button
+        &lt;/Alert>
+      &lt;/Snackbar>
+      &lt;Grid container spacing={3}>
+        &lt;Grid item xs={12} md={5}>
+          &lt;Paper sx={{ p: 2, backgroundColor: "#f0f0f0" }}>
+            &lt;Button
               variant="contained"
               onClick={() => setShowCreateNewOrg(true)}
               sx={{ mb: 2, backgroundColor: "#1976d2" }}
             >
               + Create New Org
-            </Button>
-            <List sx={{ maxHeight: 600, overflow: "auto" }}>
+            &lt;/Button>
+            &lt;List sx={{ maxHeight: 600, overflow: "auto" }}>
               {organizations.map((org, index) => (
-                <ListItem key={index} disablePadding>
-                  <ListItemButton
+                &lt;ListItem key={index} disablePadding>
+                  &lt;ListItemButton
                     onClick={() => handleOrgClick(org)}
                     sx={{ textAlign: "left" }}
                   >
-                    <ListItemText
+                    &lt;ListItemText
                       primary={org.name}
                       primaryTypographyProps={{
                         fontSize: "1.1rem",
                         color: "#1976d2",
                       }}
                     />
-                  </ListItemButton>
-                </ListItem>
+                  &lt;/ListItemButton>
+                &lt;/ListItem>
               ))}
-            </List>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={7}>
+            &lt;/List>
+          &lt;/Paper>
+        &lt;/Grid>
+        &lt;Grid item xs={12} md={7}>
           {renderOrgDetails()}
-        </Grid>
-      </Grid>
-    </Container>
+        &lt;/Grid>
+      &lt;/Grid>
+    &lt;/Container>
   );
 }
 
 export default NetAdminPage;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AdminPage">AdminPage</a></li><li><a href="global.html#Dashboard">Dashboard</a></li><li><a href="global.html#EntryTable">EntryTable</a></li><li><a href="global.html#FileUpload">FileUpload</a></li><li><a href="global.html#GenericNoParameterQuery">GenericNoParameterQuery</a></li><li><a href="global.html#GenericQuery">GenericQuery</a></li><li><a href="global.html#GenericSingleParameterQuery">GenericSingleParameterQuery</a></li><li><a href="global.html#GenericTable">GenericTable</a></li><li><a href="global.html#GenericTimeQuery">GenericTimeQuery</a></li><li><a href="global.html#LoginPage">LoginPage</a></li><li><a href="global.html#MainListItems">MainListItems</a></li><li><a href="global.html#NetAdminPage">NetAdminPage</a></li><li><a href="global.html#ResearcherPage">ResearcherPage</a></li><li><a href="global.html#SecondaryListItems">SecondaryListItems</a></li><li><a href="global.html#Title">Title</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 19 2024 22:26:47 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
