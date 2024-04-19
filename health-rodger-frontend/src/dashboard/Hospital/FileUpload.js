@@ -5,8 +5,11 @@ import Input from '@mui/material/Input';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import axios from 'axios';
+import { Typography } from '@mui/material';
 
-const FileUpload = ({ onFileSelectSuccess, onFileSelectError }) => {
+export default function FileUpload({ onFileSelectSuccess, onFileSelectError }) {
+
     const [fileName, setFileName] = useState('');
 
     const handleFileInput = (e) => {
@@ -14,7 +17,7 @@ const FileUpload = ({ onFileSelectSuccess, onFileSelectError }) => {
         if (!file) {
             onFileSelectError("No file selected");
         } else {
-            setFileName(file.name);
+            setFileName(file.name); // maybe just file?
             onFileSelectSuccess(file);
         }
     };
@@ -33,10 +36,12 @@ const FileUpload = ({ onFileSelectSuccess, onFileSelectError }) => {
             <TextField
                 margin="normal"
                 fullWidth
-                variant="outlined"
-                value={fileName}
+                value={fileName == '' ? "Your filename.csv" : fileName}
                 disabled
             />
+            <Typography variant="caption" color="text.secondary">
+                File must be in CSV format
+            </Typography>
             <label htmlFor="upload-file">
                 <Button
                     variant="contained"
@@ -44,11 +49,9 @@ const FileUpload = ({ onFileSelectSuccess, onFileSelectError }) => {
                     component="span"
                     startIcon={<CloudUploadIcon />}
                 >
-                    Upload
+                    Select File
                 </Button>
             </label>
         </FormControl>
     );
 };
-
-export default FileUpload;
