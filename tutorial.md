@@ -12,7 +12,7 @@ docker remove kind-control-plane
 Or by following the cleanup instructions at the end of the tutorial. This tutorial will add some files.
 
 Resources:
-
+- [https://hyperledger.github.io/bevel-operator-fabric/docs/]
 - [Hyperledger Fabric build ARM](https://www.polarsparc.com/xhtml/Hyperledger-ARM-Build.html)
 
 ## Create Kubernetes Cluster
