@@ -1,0 +1,21 @@
+id,name,type,ipAddress,available,lastUpdate,isWearable,gpsLocation,hospital,department,contactPerson
+13857,glucose meter 437,glucose meter,155.144.107.9,false,1376842974.0,true,"5.4259, -76.55906",would hospital,Psychiatry,Lori Holloway
+81777,dialysis machine 124,other,47.79.170.49,true,653712602.0,false,n/a,at hospital,Cardiology,Chris Everett
+43057,centrifuge 817,medical monitorlaboratory equipment,168.175.216.199,true,33497882.0,false,n/a,end hospital,Emergency,Eric Taylor
+56585,blood pressure monitor 396,blood pressure monitor,148.235.216.176,true,408762179.0,true,"-85.19127, 5.96929",meet hospital,Radiology,Cathy Phillips
+69901,smart watch 725,smart watch,46.121.219.199,false,34875454.0,true,"-35.15507, 173.98014",really hospital,Oncology,Mckenzie Taylor
+69782,MRI 896,diagnostic,24.190.35.218,false,1047495281.0,false,n/a,project hospital,Radiology,Joy Lewis
+26318,ultrasound 335,medical monitorlaboratory equipment,159.247.42.194,true,424904548.0,false,n/a,sell hospital,Geriatric,Lacey Morgan
+93883,incubator 974,diagnostic,190.147.15.34,true,1693366883.0,false,n/a,program hospital,Neurology,Daniel Hernandez
+89652,incubator 801,medical monitorlaboratory equipment,82.64.190.129,false,1516646279.0,false,n/a,politics hospital,Radiology,Joseph Moss
+61402,ventilator 806,other,51.97.201.21,true,227320054.0,false,n/a,enough hospital,Anesthesiology,Tyler Floyd
+89568,CT 693,life support,13.6.208.137,false,573537984.0,false,n/a,weight hospital,Psychiatry,Jason Rose
+98070,defibrillator 257,diagnostic,42.162.172.88,false,1296024753.0,false,n/a,edge hospital,ENT,Jason Gonzales
+74942,air purifier 439,diagnostic,179.170.245.77,false,928355659.0,false,n/a,general hospital,Geriatric,Robert Stanton
+81519,x-ray machine 857,diagnostic,10.209.8.0,true,276574816.0,false,n/a,next hospital,Radiology,Matthew Calhoun
+38487,PET 242,other,80.63.79.249,true,812491219.0,false,n/a,including hospital,Cardiology,Timothy Edwards
+59641,CT 773,life support,19.133.73.196,false,701062504.0,false,n/a,today hospital,Psychiatry,Patricia Bentley
+36559,smart watch 661,smart watch,58.124.134.17,true,375733295.0,true,"51.10304, 168.90902",campaign hospital,Anesthesiology,Bryan Smith
+37614,centrifuge 639,treatment,109.129.130.226,false,227606962.0,false,n/a,action hospital,ENT,Miguel Barr
+29207,dialysis machine 215,diagnostic,185.67.138.2,false,1603383275.0,false,n/a,national hospital,ENT,Andrew Roy
+56348,autoclave 631,life support,68.240.95.0,false,370278739.0,false,n/a,ask hospital,Neurology,Robin Murphy
