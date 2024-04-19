@@ -58,3 +58,8 @@ The src/server.ts file contains the code for the server. Endpoints are included 
 - /ping to ping the blockchain
 - /evaluate to evaluate a transaction, for example query for a device
 - /submit to submit a transaction, for example upload a device
+- /create-organization to create an organization
+- /disable-organization to disable and organization
+- /list-organizations to list all organizations
+- /disable-organization to disable a specific organization
+- /create-peer to create a peer

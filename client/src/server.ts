@@ -407,6 +407,7 @@ async function main() {
         }
     })
 
+    // Create a new organization
     app.post("/create-organization", async (req, res) => {
         const { caImage, caVersion, storageClass, capacity, orgName, enrollId, enrollPw, hosts, istioPort } = req.body;
 
@@ -449,6 +450,8 @@ async function main() {
         });
     });
 
+
+    // Disable an organization
     app.post("/disable-organization", async (req, res) => {
         const { orgName } = req.body;
 
@@ -468,6 +471,7 @@ async function main() {
         }
     });
 
+    // List all organizations
     app.get("/list-organizations", async (req, res) => {
         const command = 'kubectl get deployments -n default -l app=hlf-ca -o json';
 
@@ -491,6 +495,7 @@ async function main() {
         });
     });    
 
+    // Disable one organization
     app.post("/disable-organization", async (req, res) => {
         const { orgName } = req.body;
 
@@ -510,6 +515,7 @@ async function main() {
         }
     });
 
+    // Create a peer
     app.post("/create-peer", async (req, res) => {
         const { orgName } = req.body; // Only organization name is expected from the frontend
         if (!orgName) {
