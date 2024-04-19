@@ -280,6 +280,7 @@ async function main() {
             let role = null;
             if (roleCheck.result.type == 'admin') {
                 role = 'netadmin'
+                console.log(roleCheck.result.attrs)
                 for(const attr_list of roleCheck.result.attrs ) {
                     if( attr_list.name == "role" ) {
                         if (attr_list.value == "orgadmin") {
@@ -287,7 +288,6 @@ async function main() {
                         }
                     }
                 }
-                console.log(roleCheck)
             }
             else {
                 for(const attr_list of roleCheck.result.attrs ) {

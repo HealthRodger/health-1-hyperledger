@@ -38,6 +38,12 @@ export const MainListItems = ({ setClickedButton, role }) => {
         </ListItemIcon>
         <ListItemText primary="Admin" />
       </ListItemButton> : <></>}
+      {role == "NetAdmin" ? <ListItemButton onClick={() => setClickedButton("NetAdminPage")}>
+        <ListItemIcon>
+          <DashboardIcon />
+        </ListItemIcon>
+        <ListItemText primary="NetAdmin" />
+      </ListItemButton> : <></>}
     </React.Fragment>
   );
 };
