@@ -16,7 +16,11 @@ const cors = require('cors');
 const revokedUsersFile = 'revokedUsers.json';
 
 async function main() {
+
+    // Check the configuration using config.ts
     checkConfig()
+
+    // Get details of the network
     const networkConfig = yaml.parse(await fs.readFile(config.networkConfigPath, 'utf8'));
     const orgPeerNames = _.get(networkConfig, `organizations.${config.mspID}.peers`)
     if (!orgPeerNames) {
@@ -48,11 +52,13 @@ async function main() {
         throw new Error(`Certificate authority ${config.caName} does not have a URL`);
     }
 
+    // Create CA services
     const fabricCAServices = new FabricCAServices(caURL, {
         trustedRoots: [ca.tlsCACerts.pem[0]],
         verify: true,
     }, ca.caName)
 
+    // Create identity service
     const identityService = fabricCAServices.newIdentityService()
     const registrarUserResponse = await fabricCAServices.enroll({
         enrollmentID: ca.registrar.enrollId,
@@ -99,18 +105,23 @@ async function main() {
         next();
     });
     const users = {}
+
+    // Endpoint to sign up a new user
     app.post("/signup", async (req, res) => {
         const { username, password, role } = req.body; // Include role in the destructured body
 
         const xUserHeader = req.get('x-user'); // or use req.headers['x-user']
         console.log(xUserHeader); // Do something with the header value
+
+        // Check that user attempting to sign someone up is an admin
         let roleCheck = (await identityService.getOne(xUserHeader, registrar)).result.type;
         if (roleCheck == 'admin') {
-            // Validate the provided role
+            // Validate the provided role, only allow role of researcher or hospital
             if (!['researcher', 'hospital'].includes(role)) {
                 return res.status(400).send("Invalid role specified. Must be 'researcher' or 'hospital'.");
             }
         
+            // Ensure username not taken
             let identityFound = null;
             try {
                 identityFound = await identityService.getOne(username, registrar);
@@ -122,6 +133,7 @@ async function main() {
                 return;
             }
         
+            // Register the new user
             await fabricCAServices.register({
                 enrollmentID: username,
                 enrollmentSecret: password,
@@ -144,10 +156,14 @@ async function main() {
             res.status(500).send("Failed to retrieve users");
         }
     });
+
+    // Get list of all users
     app.get("/users", async (req, res) => {
         try {
             const xUserHeader = req.get('x-user'); // or use req.headers['x-user']
             console.log(xUserHeader); // Do something with the header value
+
+            // Check that an admin is performing the operation
             let roleCheck = (await identityService.getOne(xUserHeader, registrar)).result.type;
             if (roleCheck == 'admin') {
                 const identities = await identityService.getAll(registrar); // Fetch all registered identities
@@ -171,6 +187,8 @@ async function main() {
             res.status(500).send("Failed to retrieve users");
         }
     });
+
+    // "Remove" a user by revoking their certificate
     app.post("/revoke", async (req, res) => {
         const { username } = req.body;
         try {
@@ -185,6 +203,7 @@ async function main() {
                     reason: 'cessationOfOperation',
                 }, registrar);
 
+                // Save revoked users to a file for easier checking
                 const revokedUsers = JSON.parse(await fs.readFile(revokedUsersFile, 'utf8') || '{}');
                 revokedUsers[username] = true;
                 await fs.writeFile(revokedUsersFile, JSON.stringify(revokedUsers, null, 2));
@@ -201,6 +220,8 @@ async function main() {
             res.status(500).send(`Failed to revoke user: ${error.message}`);
         }
     });
+
+    // Check the role of a user
     app.post("/role_check", async (req, res) => {
         const { username } = req.body;
     
@@ -237,6 +258,8 @@ async function main() {
             res.status(401).send("Role check failed");
         }
     });
+
+    // Login a user in the frontend
     app.post("/login", async (req, res) => {
         const { username, password } = req.body;
     
@@ -270,6 +293,8 @@ async function main() {
             res.status(401).send("Login failed: Incorrect username or password");
         }
     });
+
+    // Set contracts for users
     app.use(async (req, res, next) => {
         (req as any).contract = contract
         console.log(contract)
@@ -279,8 +304,7 @@ async function main() {
             console.log(user)
             console.log(users)
             if (user && users[user]) {
-                console.log("a")
-                log.info(`utilizando usuario ${user}`)
+                log.info(`Using user: ${user}`)
                 const connectOptions = await newConnectOptions(
                     grpcConn,
                     config.mspID,
@@ -298,6 +322,8 @@ async function main() {
             next(e)
         }
     })
+
+    // "Ping" the blockchain
     app.get("/ping", async (req, res) => {
         try {
             const responseBuffer = await (req as any).contract.evaluateTransaction("Ping");
@@ -309,6 +335,7 @@ async function main() {
         }
     })
 
+    // Evaluate a transaction
     app.post("/evaluate", async (req, res) => {
         try {
             const fcn = req.body.fcn
@@ -321,6 +348,7 @@ async function main() {
         }
     })
 
+    // Submit a transaction
     app.post("/submit", async (req, res) => {
         try {
             const fcn = req.body.fcn
@@ -333,6 +361,7 @@ async function main() {
         }
     })
 
+    // Set up the server to be running on the provided port and address
     const server = app.listen(
         {
             port: process.env.PORT || 3003,

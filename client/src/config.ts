@@ -7,6 +7,7 @@ export interface Config {
     networkConfigPath: string;
 }
 
+// Set ca, channel, chaincode, msp, hlf user, and network config path
 export const config: Config = {
     caName: process.env.CA_NAME,
     channelName: process.env.CHANNEL_NAME,
@@ -16,6 +17,7 @@ export const config: Config = {
     networkConfigPath: process.env.NETWORK_CONFIG_PATH,
 }
 
+// Check that everything is set
 export function checkConfig() {
     if (!config.caName) {
         throw new Error("CA_NAME is not set");
