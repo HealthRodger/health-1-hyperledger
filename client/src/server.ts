@@ -414,7 +414,7 @@ async function main() {
                         console.log(`Organization CA created successfully: ${stdout}`);
 
             const registerCommand = `kubectl hlf ca register --name=${orgName}-ca --namespace=default --user=admin --secret=adminpw ` +
-                `--type=admin --enroll-id=${enrollId} --enroll-secret=${enrollPw} --mspid=${orgName}MSP --attributes="abac.creator=true"`;
+                `--type=admin --enroll-id=${enrollId} --enroll-secret=${enrollPw} --mspid=${orgName}MSP --attributes="role=orgadmin"`;
 
             exec(registerCommand, (regError, regStdout, regStderr) => {
                 if (regError || regStderr) {
