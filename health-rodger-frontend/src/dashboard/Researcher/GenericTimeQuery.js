@@ -32,7 +32,8 @@ export default function GenericTimeQuery({
 
   const sendQueryToServer = async () => {
     const functionName = "QueryAssets";
-    const functionArgs = [argsToQueryString(selectedDate)];
+    const unixTime = Math.floor(selectedDate.getTime() / 1000);
+    const functionArgs = [argsToQueryString(unixTime)];
 
     setUploadStatus("Querying all assets...");
 
