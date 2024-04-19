@@ -6,9 +6,9 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import axios from 'axios';
-import * as $ from 'jquery';
+import { Typography } from '@mui/material';
 
-export default function FileUpload() {
+export default function FileUpload({ onFileSelectSuccess, onFileSelectError }) {
 
     const [fileName, setFileName] = useState('');
 
@@ -20,89 +20,6 @@ export default function FileUpload() {
             setFileName(file.name); // maybe just file?
             onFileSelectSuccess(file);
         }
-    };
-
-    const [uploadStatus, setUploadStatus] = useState('');
-
-    const handleUploadClick = async (e) => {
-        e.preventDefault();
-        if (!file) {
-        return;
-        }
-
-        
-        // Retrieve the username from local storage
-        const username = localStorage.getItem('username');
-
-        let data = $.csv.toObjects(fileName);
-        let success = []
-        let fail = []
-        let count = 0
-        for(var asset of data) {
-
-            // Skip first line of csv with the headers
-            if (count == 0 ) { 
-                count++;
-                continue;
-            }
-            
-            // Submit each asset individually
-            try {
-        
-                const args = [
-                    asset.id,
-                    asset.name,
-                    asset.type,
-                    asset.ipAddress,
-                    asset.available,
-                    asset.lastUpdate,
-                    asset.isWearable,
-                    asset.gpsLocation.replace("\"", ""), // Remove quotation marks present in csv file
-                    asset.hospital,
-                    asset.department,
-                    asset.contactPerson,
-                ];
-                
-                // Check if the username exists
-                if (!username) {
-                    throw new Error('No username found in local storage.');
-                }
-            
-                // Make the HTTP post request with the "x-user" header
-                const response = await axios.post('http://localhost:3003/submit', {
-                    fcn: 'CreateAsset',
-                    args: args,
-                }, {
-                    headers: {
-                    'x-user': username, // Include the "x-user" header
-                    },
-                });
-            
-                if (response.status === 200) {
-                    setUploadStatus('Asset submitted successfully');
-                    success.append(count);
-                } else {
-                    setUploadStatus('Failed to submit an asset');
-                    fail.append(count);
-                }
-            } catch (error) {
-            setUploadStatus(`Error submitting an asset: ${error.message}`);
-            fail.append(count);
-            }
-            count++;
-        }
-
-        // Set final uploadstatus
-        let failureinfo = ""
-        if( length(fail) > 0 ) {
-            failureinfo = "\nFailures were on lines: "
-            for( num of fail) {
-                failureinfo = failureinfo + num.toString() + ", "
-            }
-            failureinfo = failureinfo.substring(0, str.length - 2);
-        }
-        setUploadStatus( str(success.length) + "/" + str(count - 1) + " assets successfully uploaded" + failureinfo)
-
     };
 
     return (
@@ -119,28 +36,22 @@ export default function FileUpload() {
             <TextField
                 margin="normal"
                 fullWidth
-                variant="outlined"
-                value={fileName}
+                value={fileName == '' ? "Your filename.csv" : fileName}
                 disabled
             />
+            <Typography variant="caption" color="text.secondary">
+                File must be in CSV format
+            </Typography>
             <label htmlFor="upload-file">
                 <Button
-                    onClick={handleUploadClick}
                     variant="contained"
                     color="primary"
                     component="span"
                     startIcon={<CloudUploadIcon />}
                 >
-                    Upload
+                    Select File
                 </Button>
             </label>
-            <TextField
-                margin="normal"
-                fullWidth
-                variant="outlined"
-                value={uploadStatus}
-                disabled
-            />
         </FormControl>
     );
 };
