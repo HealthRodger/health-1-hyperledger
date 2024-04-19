@@ -1,4 +1,32 @@
-import React, { useState } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Researcher/GenericSingleParameterQuery.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Researcher/GenericSingleParameterQuery.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState } from "react";
 import {
   Container, // Material UI container component for centering the layout on the page
   Grid, // Material UI component for creating a responsive grid layout
@@ -25,7 +53,7 @@ import config from "../../config"; // Configuration file that includes API URL
  * @param {string} props.parameterName - The name of the parameter to be used in the query.
  * @param {string} [props.parameterType="string"] - The data type of the parameter (e.g., "string", "number").
  * @param {function} props.argsToQueryString - A function that constructs the query string from the input parameter.
- * @param {Array<string>} props.headers - Column headers for the results table.
+ * @param {Array&lt;string>} props.headers - Column headers for the results table.
  * @returns {React.ReactElement} The `GenericSingleParameterQuery` component.
  */
 function GenericSingleParameterQuery({
@@ -75,9 +103,9 @@ function GenericSingleParameterQuery({
   // Function to determine which status icon to display based on the current upload status
   const getStatusIcon = () => {
     if (uploadStatus.toLowerCase().includes("error")) {
-      return <ErrorOutline sx={{ fontSize: 40, color: red[500] }} />;
+      return &lt;ErrorOutline sx={{ fontSize: 40, color: red[500] }} />;
     } else if (uploadStatus.toLowerCase().includes("completed")) {
-      return <CheckCircle sx={{ fontSize: 40, color: green[500] }} />;
+      return &lt;CheckCircle sx={{ fontSize: 40, color: green[500] }} />;
     } else {
       return null; // No icon is displayed for other statuses
     }
@@ -98,11 +126,11 @@ function GenericSingleParameterQuery({
 
   // Render the component UI using Material UI components
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4, py: 4, background: "#eee" }}>
-      <Grid container spacing={3}>
+    &lt;Container maxWidth="lg" sx={{ mt: 4, mb: 4, py: 4, background: "#eee" }}>
+      &lt;Grid container spacing={3}>
         {/* Query input field */}
-        <Grid item xs={12} md={8} lg={9}>
-          <Paper
+        &lt;Grid item xs={12} md={8} lg={9}>
+          &lt;Paper
             sx={{
               p: 2,
               display: "flex",
@@ -112,10 +140,10 @@ function GenericSingleParameterQuery({
               height: 240,
             }}
           >
-            <Typography variant="h5" sx={{ m: 2 }}>
+            &lt;Typography variant="h5" sx={{ m: 2 }}>
               {title}
-            </Typography>
-            <TextField
+            &lt;/Typography>
+            &lt;TextField
               label={parameterName} // Label for the input field
               variant="outlined" // Outlined variant of the text field
               type={parameterType} // Set the type (e.g., "string", "number") of the input field
@@ -123,18 +151,18 @@ function GenericSingleParameterQuery({
               onChange={handleQueryChange} // Function to call when the input field changes
               sx={{ mb: 2 }} // Margin bottom for styling
             />
-            <Button
+            &lt;Button
               variant="contained" // Contained variant of the button
               color="primary" // Color of the button
               onClick={sendQueryToServer} // Function to call when the button is clicked
             >
               Send Query
-            </Button>
-          </Paper>
-        </Grid>
+            &lt;/Button>
+          &lt;/Paper>
+        &lt;/Grid>
         {/* Status display */}
-        <Grid item xs={12} md={4} lg={3}>
-          <Paper
+        &lt;Grid item xs={12} md={4} lg={3}>
+          &lt;Paper
             sx={{
               p: 2,
               display: "flex",
@@ -146,7 +174,7 @@ function GenericSingleParameterQuery({
             }}
           >
             {getStatusIcon()}
-            <Typography
+            &lt;Typography
               component="p"
               variant="h4"
               sx={{
@@ -158,21 +186,44 @@ function GenericSingleParameterQuery({
               }}
             >
               {uploadStatus}
-            </Typography>
-          </Paper>
-        </Grid>
+            &lt;/Typography>
+          &lt;/Paper>
+        &lt;/Grid>
         {/* Table display for query results */}
-        <Grid item xs={12}>
-          <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-            <GenericTable
+        &lt;Grid item xs={12}>
+          &lt;Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
+            &lt;GenericTable
               headers={headers}
               entries={entries.map((entry) => entry.Record)}
             />
-          </Paper>
-        </Grid>
-      </Grid>
-    </Container>
+          &lt;/Paper>
+        &lt;/Grid>
+      &lt;/Grid>
+    &lt;/Container>
   );
 }
 
 export default GenericSingleParameterQuery;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AdminPage">AdminPage</a></li><li><a href="global.html#Dashboard">Dashboard</a></li><li><a href="global.html#EntryTable">EntryTable</a></li><li><a href="global.html#FileUpload">FileUpload</a></li><li><a href="global.html#GenericNoParameterQuery">GenericNoParameterQuery</a></li><li><a href="global.html#GenericQuery">GenericQuery</a></li><li><a href="global.html#GenericSingleParameterQuery">GenericSingleParameterQuery</a></li><li><a href="global.html#GenericTable">GenericTable</a></li><li><a href="global.html#GenericTimeQuery">GenericTimeQuery</a></li><li><a href="global.html#LoginPage">LoginPage</a></li><li><a href="global.html#MainListItems">MainListItems</a></li><li><a href="global.html#ResearcherPage">ResearcherPage</a></li><li><a href="global.html#SecondaryListItems">SecondaryListItems</a></li><li><a href="global.html#Title">Title</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 19 2024 17:17:57 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
