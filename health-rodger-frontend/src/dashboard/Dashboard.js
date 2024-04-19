@@ -20,6 +20,7 @@ import ResearcherPage from "./Researcher/ResearcherPage";
 import LoginPage from "./Login/LoginPage";
 import axios from "axios";
 import config from "../config";
+import NetAdminPage from "./Admin/NetAdminPage";
 
 const drawerWidth = 240;
 
@@ -100,6 +101,11 @@ function Dashboard() {
           // If role check passes, set the role state
           setRole("Admin");
           setClickedButton("AdminPage");
+        }
+        if (response.data === "netadmin") {
+          // If role check passes, set the role state
+          setRole("NetAdmin");
+          setClickedButton("NetAdminPage");
         }
         if (response.data === "hospital") {
           // If role check passes, set the role state
@@ -210,8 +216,10 @@ function Dashboard() {
             <ResearcherPage />
           ) : clickedButton == "LoginPage" ? (
             <LoginPage />
-          ) : (
+          ) : clickedButton == "HospitalPage" ? (
             <HospitalPage />
+          ) : (
+            <NetAdminPage />
           )}
         </Box>
 
