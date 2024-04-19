@@ -50,7 +50,7 @@ function ResearcherPage() {
 
       {/* Instances of GenericTimeQuery configured to fetch devices based on timestamp criteria. Each takes a title, headers for the table, and a function that constructs the query string from a timestamp. */}
       &lt;GenericTimeQuery
-        title="List all devices not updated since given timestamp"
+        title="1. List all devices not updated since given timestamp"
         headers={["ID", "Name", "LastUpdate"]}
         argsToQueryString={(timestamp) => {
           // Constructs a CouchDB query for devices last updated before the given timestamp
@@ -58,7 +58,7 @@ function ResearcherPage() {
         }}
       />
       &lt;GenericTimeQuery
-        title="List all devices updated since given timestamp"
+        title="2. List all devices updated since given timestamp"
         headers={["ID", "Name", "LastUpdate"]}
         argsToQueryString={(timestamp) => {
           // Constructs a CouchDB query for devices last updated after the given timestamp
@@ -66,7 +66,7 @@ function ResearcherPage() {
         }}
       />
       &lt;GenericTimeQuery
-        title="List all available devices not updated since given timestamp"
+        title="3. List all available devices not updated since given timestamp"
         headers={["ID", "Name", "LastUpdate"]}
         argsToQueryString={(timestamp) => {
           // Additional query to filter by availability status
@@ -74,7 +74,7 @@ function ResearcherPage() {
         }}
       />
       &lt;GenericTimeQuery
-        title="List all non-available devices not updated since given timestamp"
+        title="4. List all non-available devices not updated since given timestamp"
         headers={["ID", "Name", "LastUpdate"]}
         argsToQueryString={(timestamp) => {
           // Additional query to filter by non-availability status
@@ -84,7 +84,19 @@ function ResearcherPage() {
 
       {/* Instances of GenericSingleParameterQuery are configured to perform queries based on single parameters like department name or device type. */}
       &lt;GenericSingleParameterQuery
-        title="5a. List all devices from a given department (over all hospitals)"
+        title={
+          "5. List all devices with a given name (over all hospitals and departments)"
+        }
+        headers={["ID", "Name", "Available", "LastUpdate", "Owner"]}
+        parameterName="Device Name"
+        argsToQueryString={(deviceName) => {
+          return `{"selector": {"Name": "${deviceName}"}, "fields": ["ID", "Name", "Available", "LastUpdate", "Owner.Hospital", "Owner.ContactPerson"]}`;
+        }}
+      />
+      &lt;GenericSingleParameterQuery
+        title={
+          "6. List all devices from a given department (over all hospitals)"
+        }
         headers={["ID", "Name", "Available", "LastUpdate", "Owner"]}
         parameterName="Department name"
         argsToQueryString={(department) => {
@@ -94,7 +106,9 @@ function ResearcherPage() {
       />
       {/* Additional queries for available and non-available devices within a department */}
       &lt;GenericSingleParameterQuery
-        title="5b. List all available devices from a given department (over all hospitals)"
+        title={
+          "7. List all available devices from a given department (over all hospitals)"
+        }
         headers={["ID", "Name", "LastUpdate", "Owner"]}
         parameterName="Department name"
         argsToQueryString={(department) => {
@@ -102,7 +116,9 @@ function ResearcherPage() {
         }}
       />
       &lt;GenericSingleParameterQuery
-        title="5c. List all non-available devices from a given department (over all hospitals)"
+        title={
+          "8. List all non-available devices from a given department (over all hospitals)"
+        }
         headers={["ID", "Name", "LastUpdate", "Owner"]}
         parameterName="Department name"
         argsToQueryString={(department) => {
@@ -110,7 +126,7 @@ function ResearcherPage() {
         }}
       />
       &lt;GenericSingleParameterQuery
-        title="6. List all devices of a given type"
+        title={"9. List all devices of a given type"}
         headers={["ID", "Name", "Available", "LastUpdate"]}
         parameterName="Type"
         argsToQueryString={(type) => {
@@ -142,13 +158,13 @@ export default ResearcherPage;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AdminPage">AdminPage</a></li><li><a href="global.html#Dashboard">Dashboard</a></li><li><a href="global.html#EntryTable">EntryTable</a></li><li><a href="global.html#FileUpload">FileUpload</a></li><li><a href="global.html#GenericNoParameterQuery">GenericNoParameterQuery</a></li><li><a href="global.html#GenericQuery">GenericQuery</a></li><li><a href="global.html#GenericSingleParameterQuery">GenericSingleParameterQuery</a></li><li><a href="global.html#GenericTable">GenericTable</a></li><li><a href="global.html#GenericTimeQuery">GenericTimeQuery</a></li><li><a href="global.html#LoginPage">LoginPage</a></li><li><a href="global.html#MainListItems">MainListItems</a></li><li><a href="global.html#ResearcherPage">ResearcherPage</a></li><li><a href="global.html#SecondaryListItems">SecondaryListItems</a></li><li><a href="global.html#Title">Title</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AdminPage">AdminPage</a></li><li><a href="global.html#Dashboard">Dashboard</a></li><li><a href="global.html#EntryTable">EntryTable</a></li><li><a href="global.html#FileUpload">FileUpload</a></li><li><a href="global.html#GenericNoParameterQuery">GenericNoParameterQuery</a></li><li><a href="global.html#GenericQuery">GenericQuery</a></li><li><a href="global.html#GenericSingleParameterQuery">GenericSingleParameterQuery</a></li><li><a href="global.html#GenericTable">GenericTable</a></li><li><a href="global.html#GenericTimeQuery">GenericTimeQuery</a></li><li><a href="global.html#LoginPage">LoginPage</a></li><li><a href="global.html#MainListItems">MainListItems</a></li><li><a href="global.html#NetAdminPage">NetAdminPage</a></li><li><a href="global.html#ResearcherPage">ResearcherPage</a></li><li><a href="global.html#SecondaryListItems">SecondaryListItems</a></li><li><a href="global.html#Title">Title</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 19 2024 17:17:57 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 19 2024 22:26:47 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>
