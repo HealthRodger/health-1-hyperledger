@@ -1,4 +1,32 @@
-import * as React from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Admin/AdminPage.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Admin/AdminPage.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import * as React from "react";
 import { useState } from "react";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
@@ -53,7 +81,7 @@ function AdminPage({showSnackbar}) {
         const formattedUsers = response.data
           .filter((user) => {
             // Exclude users whose 'revoked' attribute is true or have specific ids
-            return !user.revoked && user.id !== "enroll" && user.id !== "peer";
+            return !user.revoked &amp;&amp; user.id !== "enroll" &amp;&amp; user.id !== "peer";
           }) // Properly excludes revoked users and those with ids 'enroll' or 'peer'
           .map((user) => {
             let roleAttribute = user.attributes.find(
@@ -87,7 +115,7 @@ function AdminPage({showSnackbar}) {
 
   const handleAddUser = () => {
     const x_username = localStorage.getItem("username");
-    if (newUser.username && newUser.password && newUser.role) {
+    if (newUser.username &amp;&amp; newUser.password &amp;&amp; newUser.role) {
       // Construct the user data
       const userData = {
         username: newUser.username,
@@ -148,15 +176,15 @@ function AdminPage({showSnackbar}) {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Grid container spacing={3}>
+    &lt;Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      &lt;Grid container spacing={3}>
         {/* Add User Form */}
-        <Grid item xs={12} md={6} lg={4}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
+        &lt;Grid item xs={12} md={6} lg={4}>
+          &lt;Paper sx={{ p: 2 }}>
+            &lt;Typography variant="h6" gutterBottom>
               Add User
-            </Typography>
-            <TextField
+            &lt;/Typography>
+            &lt;TextField
               margin="normal"
               fullWidth
               name="username"
@@ -164,7 +192,7 @@ function AdminPage({showSnackbar}) {
               value={newUser.username}
               onChange={handleInputChange}
             />
-            <TextField
+            &lt;TextField
               margin="normal"
               fullWidth
               name="password"
@@ -173,54 +201,76 @@ function AdminPage({showSnackbar}) {
               value={newUser.password}
               onChange={handleInputChange}
             />
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Role</InputLabel>
-              <Select
+            &lt;FormControl fullWidth margin="normal">
+              &lt;InputLabel>Role&lt;/InputLabel>
+              &lt;Select
                 name="role"
                 value={newUser.role}
                 label="Role"
                 onChange={handleInputChange}
               >
-                <MenuItem value="hospital">Hospital</MenuItem>
-                <MenuItem value="researcher">Researcher</MenuItem>
-              </Select>
-            </FormControl>
-            <Button
+                &lt;MenuItem value="hospital">Hospital&lt;/MenuItem>
+                &lt;MenuItem value="researcher">Researcher&lt;/MenuItem>
+              &lt;/Select>
+            &lt;/FormControl>
+            &lt;Button
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
               onClick={handleAddUser}
             >
               Add User
-            </Button>
-          </Paper>
-        </Grid>
+            &lt;/Button>
+          &lt;/Paper>
+        &lt;/Grid>
         {/* Users List */}
-        <Grid item xs={12}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
+        &lt;Grid item xs={12}>
+          &lt;Paper sx={{ p: 2 }}>
+            &lt;Typography variant="h6" gutterBottom>
               Users
-            </Typography>
-            <List>
+            &lt;/Typography>
+            &lt;List>
               {users.map((user, index) => (
-                <ListItem key={user.id}>
-                  <ListItemText primary={user.id} secondary={user.role} />
-                  <ListItemSecondaryAction>
-                    <IconButton
+                &lt;ListItem key={user.id}>
+                  &lt;ListItemText primary={user.id} secondary={user.role} />
+                  &lt;ListItemSecondaryAction>
+                    &lt;IconButton
                       edge="end"
                       aria-label="delete"
                       onClick={() => handleRemoveUser(user.id)}
                     >
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
+                      &lt;DeleteIcon />
+                    &lt;/IconButton>
+                  &lt;/ListItemSecondaryAction>
+                &lt;/ListItem>
               ))}
-            </List>
-          </Paper>
-        </Grid>
-      </Grid>
-    </Container>
+            &lt;/List>
+          &lt;/Paper>
+        &lt;/Grid>
+      &lt;/Grid>
+    &lt;/Container>
   );
 }
 
-export default AdminPage
+export default AdminPage</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AdminPage">AdminPage</a></li><li><a href="global.html#Dashboard">Dashboard</a></li><li><a href="global.html#EntryTable">EntryTable</a></li><li><a href="global.html#FileUpload">FileUpload</a></li><li><a href="global.html#GenericNoParameterQuery">GenericNoParameterQuery</a></li><li><a href="global.html#GenericQuery">GenericQuery</a></li><li><a href="global.html#GenericSingleParameterQuery">GenericSingleParameterQuery</a></li><li><a href="global.html#GenericTable">GenericTable</a></li><li><a href="global.html#GenericTimeQuery">GenericTimeQuery</a></li><li><a href="global.html#LoginPage">LoginPage</a></li><li><a href="global.html#MainListItems">MainListItems</a></li><li><a href="global.html#ResearcherPage">ResearcherPage</a></li><li><a href="global.html#SecondaryListItems">SecondaryListItems</a></li><li><a href="global.html#Title">Title</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 19 2024 17:17:57 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

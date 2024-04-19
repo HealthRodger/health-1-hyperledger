@@ -1,4 +1,32 @@
-import React from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Researcher/ResearcherPage.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Researcher/ResearcherPage.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from "react";
 import GenericQuery from "./GenericQuery";
 import GenericSingleParameterQuery from "./GenericSingleParameterQuery";
 // import GenericNoParameterQuery from "./GenericNoParameterQuery"; // This line is commented out, potentially for future use.
@@ -16,12 +44,12 @@ import GenericTimeQuery from "./GenericTimeQuery";
  */
 function ResearcherPage() {
   return (
-    <>
+    &lt;>
       {/* GenericQuery can be configured to perform a variety of database queries. Currently, it does not have specific props passed to it. */}
-      <GenericQuery />
+      &lt;GenericQuery />
 
       {/* Instances of GenericTimeQuery configured to fetch devices based on timestamp criteria. Each takes a title, headers for the table, and a function that constructs the query string from a timestamp. */}
-      <GenericTimeQuery
+      &lt;GenericTimeQuery
         title="List all devices not updated since given timestamp"
         headers={["ID", "Name", "LastUpdate"]}
         argsToQueryString={(timestamp) => {
@@ -29,7 +57,7 @@ function ResearcherPage() {
           return `{"selector": {"LastUpdate": {"$lt": ${timestamp}}}, "fields": ["ID", "Name", "LastUpdate"]}`;
         }}
       />
-      <GenericTimeQuery
+      &lt;GenericTimeQuery
         title="List all devices updated since given timestamp"
         headers={["ID", "Name", "LastUpdate"]}
         argsToQueryString={(timestamp) => {
@@ -37,7 +65,7 @@ function ResearcherPage() {
           return `{"selector": {"LastUpdate": {"$gt": ${timestamp}}}, "fields": ["ID", "Name", "LastUpdate"]}`;
         }}
       />
-      <GenericTimeQuery
+      &lt;GenericTimeQuery
         title="List all available devices not updated since given timestamp"
         headers={["ID", "Name", "LastUpdate"]}
         argsToQueryString={(timestamp) => {
@@ -45,7 +73,7 @@ function ResearcherPage() {
           return `{"selector": {"LastUpdate": {"$lt": ${timestamp}}, "Available": true}, "fields": ["ID", "Name", "LastUpdate"]}`;
         }}
       />
-      <GenericTimeQuery
+      &lt;GenericTimeQuery
         title="List all non-available devices not updated since given timestamp"
         headers={["ID", "Name", "LastUpdate"]}
         argsToQueryString={(timestamp) => {
@@ -55,7 +83,7 @@ function ResearcherPage() {
       />
 
       {/* Instances of GenericSingleParameterQuery are configured to perform queries based on single parameters like department name or device type. */}
-      <GenericSingleParameterQuery
+      &lt;GenericSingleParameterQuery
         title="5a. List all devices from a given department (over all hospitals)"
         headers={["ID", "Name", "Available", "LastUpdate", "Owner"]}
         parameterName="Department name"
@@ -65,7 +93,7 @@ function ResearcherPage() {
         }}
       />
       {/* Additional queries for available and non-available devices within a department */}
-      <GenericSingleParameterQuery
+      &lt;GenericSingleParameterQuery
         title="5b. List all available devices from a given department (over all hospitals)"
         headers={["ID", "Name", "LastUpdate", "Owner"]}
         parameterName="Department name"
@@ -73,7 +101,7 @@ function ResearcherPage() {
           return `{"selector": {"Owner.Department": "${department}", "Available": true}, "fields": ["ID", "Name", "LastUpdate", "Owner.Hospital", "Owner.ContactPerson"]}`;
         }}
       />
-      <GenericSingleParameterQuery
+      &lt;GenericSingleParameterQuery
         title="5c. List all non-available devices from a given department (over all hospitals)"
         headers={["ID", "Name", "LastUpdate", "Owner"]}
         parameterName="Department name"
@@ -81,7 +109,7 @@ function ResearcherPage() {
           return `{"selector": {"Owner.Department": "${department}", "Available": false}, "fields": ["ID", "Name", "LastUpdate", "Owner.Hospital", "Owner.ContactPerson"]}`;
         }}
       />
-      <GenericSingleParameterQuery
+      &lt;GenericSingleParameterQuery
         title="6. List all devices of a given type"
         headers={["ID", "Name", "Available", "LastUpdate"]}
         parameterName="Type"
@@ -90,7 +118,7 @@ function ResearcherPage() {
           return `{"selector": {"Type": "${type}"}, "fields": ["ID", "Name", "Available", "LastUpdate"]}`;
         }}
       />
-      <GenericSingleParameterQuery
+      &lt;GenericSingleParameterQuery
         title="10. List all devices owned by given hospital"
         headers={["ID", "Name", "Owner"]}
         parameterName="Hospital name"
@@ -99,8 +127,31 @@ function ResearcherPage() {
           return `{"selector": {"Owner.Hospital": "${hospital}"}, "fields": ["ID", "Name", "Owner.Department", "Owner.ContactPerson"]}`;
         }}
       />
-    </>
+    &lt;/>
   );
 }
 
 export default ResearcherPage;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AdminPage">AdminPage</a></li><li><a href="global.html#Dashboard">Dashboard</a></li><li><a href="global.html#EntryTable">EntryTable</a></li><li><a href="global.html#FileUpload">FileUpload</a></li><li><a href="global.html#GenericNoParameterQuery">GenericNoParameterQuery</a></li><li><a href="global.html#GenericQuery">GenericQuery</a></li><li><a href="global.html#GenericSingleParameterQuery">GenericSingleParameterQuery</a></li><li><a href="global.html#GenericTable">GenericTable</a></li><li><a href="global.html#GenericTimeQuery">GenericTimeQuery</a></li><li><a href="global.html#LoginPage">LoginPage</a></li><li><a href="global.html#MainListItems">MainListItems</a></li><li><a href="global.html#ResearcherPage">ResearcherPage</a></li><li><a href="global.html#SecondaryListItems">SecondaryListItems</a></li><li><a href="global.html#Title">Title</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 19 2024 17:17:57 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
